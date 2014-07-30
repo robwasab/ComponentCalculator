@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ComponentCalculator</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="schematic_button_text">Start Schematic</string>
+    <string name="drawing_button_text">Start Drawing</string>
+
+</resources>

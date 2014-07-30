@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ee.tools.componentcalculator.MainActivity$PlaceholderFragment" >
+    
+    <ScrollView 
+        android:id="@+id/scroll_view_for_button_table"
+	    android:layout_width = "match_parent"
+	    android:layout_height= "wrap_content"
+	    android:layout_centerHorizontal="true"
+        >
+        
+	<TableLayout 
+	    android:scrollbars="horizontal"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    >
+	    <TableRow 
+	        android:gravity="center_horizontal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:scrollbars="horizontal"
+	        >
+	        
+	    	<Button
+       	 		android:id="@+id/schematic_button"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:text="@string/schematic_button_text" />
+
+    		<Button
+        		android:id="@+id/drawing_button"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:text="@string/drawing_button_text" />
+
+    		<Button
+        		android:id="@+id/button3"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:text="Button" />
+    	</TableRow>
+	</TableLayout>
+	</ScrollView>
+	<LinearLayout
+	    android:layout_below="@id/scroll_view_for_button_table"
+	    android:id="@+id/main_content"
+	    android:layout_width = "match_parent"
+	    android:layout_height= "wrap_content"
+	    android:orientation="vertical" >
+	    
+	</LinearLayout>
+	    
+</RelativeLayout>
