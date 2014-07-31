@@ -295,11 +295,10 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	{
 		double space = maximum_width - item.getWidth();		
 		
-		Complex p21 = item.getNextPoint();
-				p21 = new Complex(p21.re, p21.im);
+		Complex p21 = new Complex(p11.re + maximum_width - space/2.0, p11.im);
 		
 		Complex p12 = new Complex(p11.re + space/2.0, p11.im);
-		Complex p22 = new Complex(p21.re + space/2.0, p21.im);
+		Complex p22 = new Complex(p11.re + maximum_width, p11.im);
 						
 		Complex[] tuple = new Complex[3];
 		
@@ -390,15 +389,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			
 			ComponentViewInterface this_comp = getComponentView(i);
 			
-			
 			Complex p11_next, p12_next, p21_next, p22_next;
-			
 			
 			p11_next = new Complex(p11_prev.re, p11_prev.im);
 			
 			p11_next.im += padding + prev_comp.getHeight()/2.0 + this_comp.getHeight()/2.0;
 			
-			p12_p21_p22 = get_p12_p21_p22(p11_next, first, width);
+			p12_p21_p22 = get_p12_p21_p22(p11_next, this_comp, width);
 			
 			p12_next = p12_p21_p22[0];
 			
@@ -531,68 +528,20 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		}
 	}
 	
-	private double[] series_dimensions(Complex starting_point, Canvas c)
-	{
-		float width  = c.getWidth();
-		float height = c.getHeight();
-		
-		boolean rotate180 = false;
-		
-		if ( rotation.re < 0.0 ) 
-		{
-			rotate180 = true;
-		}
-		
-		ComponentViewInterface first, last;
-		
-		do 
-		{
-			Complex xy = this.get_preferred_grab_point(this.getXY(), width, height, 
-				0, 0, rotate180, false);
-		
-			this.setXY((float)xy.re, (float)xy.im);
-		
-			first = this.getComponentView(0);
-		
-			last  = this.getComponentView(size() - 1);
-			
-			if ( (last.getXY().re - first.getXY().re) < ComponentView.axial_length )
-			{
-				width += 10;
-				continue;
-			}
-			break;
-			
-		} while(true);
-		
-		double[] tuple = new double[2];
-		
-		int WIDTH = 0, HEIGHT = 1;
-		
-		tuple[WIDTH] = last.getXY().re - first.getXY().re;
-		tuple[HEIGHT] = last.getXY().im - first.getXY().im;
-		
-		return tuple;
-	}
-	
 	public float series_width()
 	{
-		ComponentViewInterface first, last;
-		
-		first = this.getComponentView(0);	
-		last  = this.getComponentView(size() - 1);
-	
-		return (float) (last.getXY().re - first.getXY().re);
+		this.width = 0.0;
+		for (int i = 0; i < size(); i++)
+		{
+			width += this.getComponentView(i).getWidth();
+		}
+		return (float)width;
 	}
 	
 	public float series_height()
 	{
-		ComponentViewInterface first, last;
-		
-		first = this.getComponentView(0);	
-		last  = this.getComponentView(size() - 1);
-		if ( (last.getXY().im - first.getXY().im) < first.getHeight() ) return first.getHeight();
-		else return (float)(last.getXY().im - first.getXY().im + first.getHeight()/2.0 + last.getHeight()/2.0);
+		ComponentViewInterface last = this.getComponentView(size() - 1);
+		return last.getHeight();
 	}
 	
 	//Class dependant implementation
@@ -612,7 +561,6 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		{
 			rotate180 = true;
 		}
-
 		
 		Complex xy = this.get_preferred_grab_point(this.getXY(), width, height, 
 				0, 0, rotate180, false);
