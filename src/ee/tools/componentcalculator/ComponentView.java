@@ -80,6 +80,9 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		}
 	}
 	
+	//Do nothing... Already Collapsed enough
+	public void setCollapse(boolean c) { };
+	
 	public void setX(float x) 
 	{
 		this.origin_x = x;
@@ -170,6 +173,7 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		p22 = new Complex(0,0);
 		rotate = new Complex(1,0);
 		body_origin = new Complex(0,0);
+		tag = "Body";
 		recalculate();
 	}
 	
@@ -330,4 +334,17 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		
 		return new Complex(p11.re, p11.im);
 	}		
+	
+	@Override
+	public ComponentViewInterface isIn(Complex pnt)
+	{
+		if (body != null)
+		{
+			if (body.isIn(pnt))
+			{
+				return this;
+			}
+		}
+		return null;
+	}
 }

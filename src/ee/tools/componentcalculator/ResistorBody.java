@@ -1,5 +1,8 @@
 package ee.tools.componentcalculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,6 +20,7 @@ class ResistorBody implements Body
 	Path body_path;
 	
 	Complex nw, ne, se, sw, rotate;
+	List<Complex> outline;
 	
 	double value;
 	int tolerance;
@@ -50,6 +54,13 @@ class ResistorBody implements Body
 		ne = new Complex(0,0);
 		se = new Complex(0,0);
 		sw = new Complex(0,0);
+		
+		outline = new ArrayList<Complex>();
+		outline.add(nw);
+		outline.add(ne);
+		outline.add(se);
+		outline.add(sw);
+		
 		rotate = new Complex(1,0);
 		
 		body_path = new Path();
@@ -157,6 +168,11 @@ class ResistorBody implements Body
 		body_path.lineTo((float)sw.re, (float)sw.im);
 		body_path.lineTo((float)nw.re, (float)nw.im);
 		
+		outline.set(0, nw);
+		outline.set(1, ne);
+		outline.set(2, se);
+		outline.set(3, sw);
+		
 		recalculate_bands();
 	}
 	
@@ -215,6 +231,11 @@ class ResistorBody implements Body
 			
 			bands[i] = band;
 		}
+	}
+	
+	public boolean isIn(Complex pnt)
+	{
+		return InOrOut.inOrOut(outline, pnt);
 	}
 	
 	public void draw(Canvas c) {

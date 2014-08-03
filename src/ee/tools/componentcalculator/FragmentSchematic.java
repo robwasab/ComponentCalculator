@@ -102,7 +102,8 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 			raw2.add(new Component(456));
 			raw2.add(new Component(789));
 			
-			ComponentsView series_test = new ComponentsView(serial, raw2, Components.SUM, Components.RESISTOR);
+			ComponentsView series_test = new ComponentsView(
+					this, serial, raw2, Components.SUM, Components.RESISTOR);
 			
 			
 			LinkedList<Component> raw = new LinkedList<Component>();
@@ -116,7 +117,8 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 			raw.add(new Component(890000));
 			*/
 			
-			parallel = new ComponentsView(serial, raw, Components.INVERSE_INVERSE_SUM, Components.RESISTOR);
+			parallel = new ComponentsView(
+					this, serial, raw, Components.INVERSE_INVERSE_SUM, Components.RESISTOR);
 			
 			LinkedList<Component> s = new LinkedList<Component>();
 			
@@ -128,7 +130,8 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 			//s.add(new Component(456000));
 			//s.add(new Component(789000));
 			
-			series   = new ComponentsView(serial, s, Components.SUM, Components.RESISTOR);
+			series   = new ComponentsView(
+					this, serial, s, Components.SUM, Components.RESISTOR);
 			
 			invalidate();
 		}
@@ -151,6 +154,14 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 				i_x = me.getX();
 				i_y = me.getY();
 				pntr1 = me.getPointerId(0);
+				
+				Complex pnt = new Complex(i_x, i_y);
+				ComponentViewInterface comp = series.isIn(pnt);
+				if (comp != null)
+				{
+					double val = ((Component)comp).getValue();
+					Log.d(tag, ">>>" + ((Component)comp).toString());
+				}
 				break;
 					
 			case MotionEvent.ACTION_MOVE:
@@ -161,7 +172,6 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 					float d = distance(i_x, i_y, f_x, f_y);
 					if (d > 15)
 					{
-						
 						//parallel.setXY(me.getX(pntr1), me.getY(pntr1) ) ;
 						Complex move = new Complex(me.getX(pntr1), me.getY(pntr1));
 						

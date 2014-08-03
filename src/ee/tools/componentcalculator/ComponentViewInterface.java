@@ -17,6 +17,8 @@ public interface ComponentViewInterface {
 	 * Calling code assumes changes are immediate!
 	 */
 	
+	public void setCollapse(boolean collapse);
+	
 	public void setXY(float x, float y);
 	
 	public void setXY(Complex c);
@@ -53,6 +55,13 @@ public interface ComponentViewInterface {
 
 	public void restoreInstanceState(Bundle saved);
 	
+	//return the component that surrounds the pnt
+	//else return null
+	public ComponentViewInterface isIn(Complex pnt);
+	
+	//Recursive method
+	//See RecursiveSeriesDrawingUtility
+	//Both ComponentsView and ComponentView use this function
 	public Complex get_preferred_grab_point(
 			Complex starting_grab_point,
 			float screen_width,

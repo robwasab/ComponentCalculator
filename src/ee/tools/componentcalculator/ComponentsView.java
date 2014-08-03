@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import ee.tools.model.Component;
 import ee.tools.model.Components;
@@ -22,8 +23,6 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	String tag, prefix;
 	private LinkedList<Integer> serial;
 	private Paint p;
-	
-	private float screen_width, screen_height;
 	
 	/*
 	 * Parallel Components Variables:
@@ -40,10 +39,18 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	 */
 	public Complex recommended_origin;
 	
-	public ComponentsView(LinkedList<Integer> serial, List<Component> comps,
+	boolean collapse = false;
+	
+	ComponentView collapseView;
+	
+	View parent;
+	
+	public ComponentsView(View parent, LinkedList<Integer> serial, List<Component> comps,
 			int operation, int type)
 	{
 		super(null, operation, type);
+		
+		this.parent   = parent;
 		
 		rotation      = new Complex(1, 0);
 		
@@ -53,7 +60,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		grab_point    = new Complex(0, 0);
 		
 		prefix        = this.getClass().toString();
-		
+				
 		if (serial == null) 
 		{
 			serial = new LinkedList<Integer>();
@@ -108,15 +115,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				else if (c.getClass() == Components.class)
 				{
 					Components foo = (Components) c;
-					ComponentsView csv = new ComponentsView(this.getSerialNumber(), foo.components, foo.operation, foo.type);
+					ComponentsView csv = new ComponentsView(
+							parent, this.getSerialNumber(), foo.components, foo.operation, foo.type);
 					super.add(csv);
 					comps.set(i, csv);
 				}
 			}
 		}
-		
-		this.screen_width = ComponentView.axial_length * 2;
-		this.screen_height = ResistorBody.body_height * 10;
 		
 		if (super.getOrientation() == super.PARALLEL)
 		{
@@ -127,6 +132,11 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		{
 			init_series();
 		}
+		
+		//init the collapsed view
+		Body tapDat = new Tap2SeeMoreBody();
+		
+		collapseView = new ComponentView(this.getSerialNumber(), tapDat, this.getValue(), this.getQnty());
 	}
 	
 	@Override
@@ -151,6 +161,9 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	public void setXY(float x, float y)
 	{
 		this.grab_point.re = x; this.grab_point.im = y;
+		
+		if (collapse) { collapseView.setXY(x,y);  return;}			
+		
 		if (this.getOrientation() == super.PARALLEL)
 		{
 			update_parallel_values();
@@ -163,6 +176,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	{
 		this.grab_point = new Complex(c.re, c.im);
 		
+		if (collapse) { collapseView.setXY(c);  return;}			
+		
 		if (this.getOrientation() == super.PARALLEL)
 		{
 			update_parallel_values();
@@ -172,7 +187,14 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 	
 	@Override
+	public void setCollapse(boolean collapse) {	this.collapse = collapse; }
+	
+	@Override
 	public Complex getNextPoint() {
+		if (collapse)
+		{
+			return collapseView.getNextPoint();
+		}
 		if (this.orientation == super.SERIES)
 		{
 			return this.getComponentView(size()-1).getNextPoint();
@@ -181,19 +203,26 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 
 	@Override
-	public float getPadding() { return (float) 0.0; }
+	public float getPadding() { return padding; }
 	
 	public Paint getLinePaint() { return this.p; }
 	
 	public double getAngle() { return this.angle; }
 	
-	public String getName() { return "PARALLEL"; }
+	public String getName() { return "ComponentsView"; }
 	
 	@Override
 	public void setAngle(double radians) {
 		this.angle = radians;
 		rotation.re = Math.cos(radians);
 		rotation.im = Math.sin(radians);
+		
+		if (collapse)
+		{
+			collapseView.setAngle(radians);
+			return;
+		}
+		
 		if (this.getOrientation() == super.PARALLEL)
 		{
 			update_parallel_values();
@@ -213,6 +242,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	 */
 	@Override
 	public void draw(Canvas c) {
+		
+		if (collapse)
+		{
+			collapseView.draw(c);
+			return;
+		}
+		
 		if (super.getOrientation() == super.PARALLEL)
 		{
 			draw_parallel(c);
@@ -263,24 +299,46 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	
 	public float getWidth()
 	{
-		if (this.getOrientation() == SERIES)
-		{
-			return this.series_width();
-		}
+		if (collapse) { return collapseView.getWidth(); }
+		
+		if (this.getOrientation() == SERIES) { return this.series_width(); }
 		return (float)this.width;
 	}
 	
 	public float getHeight() 
 	{
-		if (this.getOrientation() == SERIES)
-		{
-			return this.series_height();
-		}
+		if (collapse) { return collapseView.getHeight(); }
+
+		if (this.getOrientation() == SERIES) { return this.series_height(); }
 		return (float)height; 
 	}
 	
 	public float getStrokeWidth() {
 		return ComponentView.stroke_width;
+	}
+	
+	public ComponentViewInterface isIn(Complex pnt)
+	{
+		if (collapse)
+		{
+			if ( collapseView.isIn(pnt) != null )
+			{
+				//Log.d("!!!", "Returning Collapsed View: " +  this.toString());
+				return this;
+			}
+			return null;
+		}
+		for (int i = 0; i < size(); i++)
+		{
+			ComponentViewInterface comp = this.getComponentView(i);
+			
+			if (comp.isIn(pnt) != null )
+			{
+				//Log.d("!!!", "Returning: " + comp.toString());
+				return comp.isIn(pnt); 
+			}
+		}
+		return null;
 	}
 	
 	/*Helper Functions*/
@@ -313,7 +371,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	private void init_parallel()
 	{
 		p = new Paint();
-		p.setColor(Color.RED);
+		p.setColor(Color.BLACK);
 		p.setStrokeWidth(ComponentView.stroke_width);
 		next = new Complex(0,0);
 		
@@ -336,6 +394,22 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			
 			//if this isn't the last element, then add the padding
 			if (i != (super.components.size() - 1)) { height += padding; }
+			
+			
+			cv.setCollapse(false);
+			//test to see if this component's width, in addition to the current grab_point.re
+			//is within the boundary
+			boolean should_collapse;
+			if (0 <= this.rotation.re)
+			{
+				should_collapse = (this.parent.getWidth() < (this.grab_point.re + cv.getWidth()) );				
+			}
+			else
+			{
+				should_collapse = ( this.grab_point.re < cv.getWidth() );
+			}
+			
+			cv.setCollapse(should_collapse);
 			
 			if (cv.getWidth() > width) { width = cv.getWidth(); }
 		}

@@ -11,6 +11,7 @@ public interface Body {
 		public void setOrigin(Complex c);
 		public void draw(Canvas c);
 		public void setAngle(double radians);
+		public boolean isIn(Complex pnt);
 		public void saveInstanceState(Bundle state);
 		public void restoreInstanceState(Bundle saved);
 }
