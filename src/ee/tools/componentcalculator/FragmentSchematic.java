@@ -10,26 +10,25 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.os.Bundle;
 
-public class FragmentSchematic extends Fragment implements OnKeyListener
+public class FragmentSchematic extends Fragment
 {
 	Context current_context;
 	Activity current_activity;
 	LinearLayout root_layout;
 	String tag = "FragmentSchematic";
 
-	EditText value_entry;
+	LinearLayout settings;
 	
 	Schematic schematic;
 	
@@ -44,23 +43,25 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 		current_context  = inflater.getContext();
 		current_activity = this.getActivity();
 		
-		schematic = new Schematic(current_context);
+		root_layout = (LinearLayout) rootView.findViewById(R.id.schematic_layout);
+		
+		settings = new LinearLayout(current_context);
+		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		settings.setLayoutParams(params);
+		
+		schematic = new Schematic(current_context, settings);
+		
+		root_layout.addView(settings);
+		
+		root_layout.addView(schematic);
 		
 		if (savedInstanceState != null)
 		{
+			schematic.restoreInstanceState(savedInstanceState);
 		}
 		
-		root_layout = (LinearLayout) rootView.findViewById(R.id.schematic_layout);
-		root_layout.addView(schematic);
 		
-		value_entry = (EditText) rootView.findViewById(R.id.value_entry);
-		init_listeners();
 		return rootView;
-	}
-	
-	private void init_listeners()
-	{
-		value_entry.setOnKeyListener(this);
 	}
 	
 	private void close_key_board(EditText edit_text)
@@ -72,6 +73,7 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 
 	public void onSaveInstanceState(Bundle state)
 	{
+		schematic.saveInstanceState(state);
 	}
 	
 	class Schematic extends SurfaceView
@@ -86,16 +88,22 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 		
 		ComponentsView parallel, series;
 		
-		public Schematic(Context context) 
+		LinearLayout settings_container;
+		
+		LinkedList<Integer> serial;
+		
+		public Schematic(Context context, LinearLayout settings_container) 
 		{
 			super(context);
 			this.setBackgroundColor(Color.CYAN);
+			this.current_context = context;
+			this.settings_container = settings_container;
 			
 			/*TEST ComponentsView */
 			
 			//Serial number
-			LinkedList<Integer> serial = new LinkedList<Integer>();
-			serial.add(420);
+			serial = new LinkedList<Integer>();
+			serial.add(0);
 			
 			LinkedList<Component> raw2 = new LinkedList<Component>();
 			
@@ -136,6 +144,15 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 			invalidate();
 		}
 		
+		public void saveInstanceState(Bundle state) {
+			series.saveInstanceState(state);
+		}
+
+		public void restoreInstanceState(Bundle state)
+		{
+			series.restoreInstanceState(state);
+		}
+		
 		private float distance(float i_x, float i_y, float f_x, float f_y) 
 		{
 			float x = f_x - i_x;
@@ -159,8 +176,17 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 				ComponentViewInterface comp = series.isIn(pnt);
 				if (comp != null)
 				{
-					double val = ((Component)comp).getValue();
-					Log.d(tag, ">>>" + ((Component)comp).toString());
+					View settings = comp.getSettingsView(this.current_context);
+					
+					if (settings != null)
+					{
+						settings_container.removeAllViews();
+					
+						settings_container.addView(settings);
+					
+						//double val = ((Component)comp).getValue();
+						Log.d(tag, ">>>" + ((Component)comp).toString());
+					}
 				}
 				break;
 					
@@ -228,32 +254,4 @@ public class FragmentSchematic extends Fragment implements OnKeyListener
 		}
 		
 	}
-	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LISTENER IMPLEMENTATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-	@Override
-	public boolean onKey(View v, int new_key, KeyEvent event) {
-		//Log.d(v.toString() , "Key Code " + new_key);
-		//Log.d(v.toString(), event.toString() + " " + event.getAction());
-		
-		//Log.d(tag, Integer.toString(new_key));
-		if (new_key != 66) return false;
-		if (event.getAction() == KeyEvent.ACTION_UP)
-		{
-		   this.close_key_board(value_entry);
-		   String value = value_entry.getText().toString();
-		   try
-		   {
-			   Double d = Double.valueOf(value);
-			   //schematic.resistor.body.setValue(d);
-			   schematic.invalidate();
-		   }
-		   catch (Exception e)
-		   {
-			   value_entry.setText("Invalid Entry");
-		   }
-		   return true;
-		}
-		
-		return false;
-	}
-
 }

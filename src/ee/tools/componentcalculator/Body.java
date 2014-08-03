@@ -1,5 +1,7 @@
 package ee.tools.componentcalculator;
 
+import java.util.LinkedList;
+
 import android.graphics.Canvas;
 import android.os.Bundle;
 
@@ -8,10 +10,12 @@ public interface Body {
 		public float getHeight();
 		public void setX(float x);
 		public void setY(float y);
+		public void setSerialNumber(LinkedList<Integer> serial);
 		public void setOrigin(Complex c);
 		public void draw(Canvas c);
 		public void setAngle(double radians);
 		public boolean isIn(Complex pnt);
 		public void saveInstanceState(Bundle state);
 		public void restoreInstanceState(Bundle saved);
+		public void setValue(double val);
 }

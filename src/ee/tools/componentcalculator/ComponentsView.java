@@ -3,6 +3,7 @@ package ee.tools.componentcalculator;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -75,9 +76,17 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		{
 			for (int i = 0; i < comps.size(); i++)
 			{
+				LinkedList<Integer> next_serial = this.getSerialNumber();
+				
+				next_serial.add(i);
+				
 				Component c = comps.get(i);
 				
-				if (c instanceof ComponentViewInterface) { super.add(comps.get(i)); }
+				if (c instanceof ComponentViewInterface) 
+				{
+					super.add(comps.get(i)); 
+					((ComponentViewInterface)comps.get(i)).setSerialNumber(next_serial);
+				}
 				
 				else if (c.getClass() == Component.class)
 				{
@@ -86,24 +95,19 @@ public class ComponentsView extends Components implements ComponentViewInterface
 					//what type of body should we add? 
 					Body b = null;
 					
-					if (type == super.RESISTOR)
+					if (type == RESISTOR)
 					{
 						int tolerance = 0;
 						try {
-							b = new ResistorBody(c.getValue(), tolerance);
+							b = new ResistorBody(next_serial, c.getValue(), tolerance);
 						} catch (ResistorException e) {
 							e.printStackTrace();
 						}
 					}
-					else if (type == super.CAPACITOR)
+					else if (type == CAPACITOR)
 					{
 					
 					}
-					
-					LinkedList<Integer> next_serial = this.getSerialNumber();
-					
-					next_serial.add(i);
-					
 					ComponentView cv = new ComponentView(next_serial, b, c.getValue(), c.getQnty());
 					
 					super.add(cv);
@@ -116,19 +120,19 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				{
 					Components foo = (Components) c;
 					ComponentsView csv = new ComponentsView(
-							parent, this.getSerialNumber(), foo.components, foo.operation, foo.type);
+							parent, next_serial, foo.components, foo.operation, foo.type);
 					super.add(csv);
 					comps.set(i, csv);
 				}
 			}
 		}
 		
-		if (super.getOrientation() == super.PARALLEL)
+		if (super.getOrientation() == PARALLEL)
 		{
 			init_parallel();
 		}
 
-		else if (super.getOrientation() == super.SERIES)
+		else if (super.getOrientation() == SERIES)
 		{
 			init_series();
 		}
@@ -145,6 +149,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		for (Integer i : serial)
 		{
 			this.serial.add(i);
+		}
+		for (int i = 0; i < size(); i++)
+		{
+			LinkedList<Integer> next_serial = this.getSerialNumber();
+			next_serial.add(i);
+			ComponentViewInterface comp = this.getComponentView(i);
+			comp.setSerialNumber(next_serial);
 		}
 	}
 
@@ -164,7 +175,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		
 		if (collapse) { collapseView.setXY(x,y);  return;}			
 		
-		if (this.getOrientation() == super.PARALLEL)
+		if (this.getOrientation() == PARALLEL)
 		{
 			update_parallel_values();
 			rotate_parallel_points();
@@ -178,7 +189,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		
 		if (collapse) { collapseView.setXY(c);  return;}			
 		
-		if (this.getOrientation() == super.PARALLEL)
+		if (this.getOrientation() == PARALLEL)
 		{
 			update_parallel_values();
 			rotate_parallel_points();
@@ -195,7 +206,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		{
 			return collapseView.getNextPoint();
 		}
-		if (this.orientation == super.SERIES)
+		if (this.orientation == SERIES)
 		{
 			return this.getComponentView(size()-1).getNextPoint();
 		}
@@ -223,13 +234,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			return;
 		}
 		
-		if (this.getOrientation() == super.PARALLEL)
+		if (this.getOrientation() == PARALLEL)
 		{
 			update_parallel_values();
 			rotate_parallel_points();
 			update_next();
 		}
-		else if (this.getOrientation() == super.SERIES)
+		else if (this.getOrientation() == SERIES)
 		{
 			//do nothing, let the code set the rotation field
 			//rotation is actually taken care of in the easy_series_arrange helper function
@@ -249,11 +260,11 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			return;
 		}
 		
-		if (super.getOrientation() == super.PARALLEL)
+		if (super.getOrientation() == PARALLEL)
 		{
 			draw_parallel(c);
 		}
-		else if (super.getOrientation() == super.SERIES)
+		else if (super.getOrientation() == SERIES)
 		{
 			if (1 <= size() )
 			{
@@ -272,20 +283,105 @@ public class ComponentsView extends Components implements ComponentViewInterface
 
 	@Override
 	public void saveInstanceState(Bundle state) {
-		// TODO Auto-generated method stub
+		LinkedList<Integer> prefix_ints = this.getSerialNumber();
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
 		
+		state.putInt(prefix + "size", size());
+		state.putInt(prefix + "type", this.type);
+		state.putInt(prefix + "orientation", this.orientation);
+		state.putInt(prefix + "operation", this.operation);
+		state.putString(prefix + "class", this.getClass().toString());
+		state.putDouble(prefix + "grab_point_x", grab_point.re);
+		state.putDouble(prefix + "grab_point_y", grab_point.im);
+		state.putDouble(prefix + "angle", rotation.phase());
+		
+		Log.d("!!!", "ComponentsView Saving..." + prefix + " " + this.getValue());
+		Log.d("!!!", "Saved size: " + size());
+		
+		for (int i = 0; i < size(); i++)
+		{
+			this.getComponentView(i).saveInstanceState(state);
+		}
 	}
 
 	@Override
 	public void restoreInstanceState(Bundle saved) {
-		// TODO Auto-generated method stub
+		LinkedList<Integer> prefix_ints = this.getSerialNumber();
 		
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
+		Log.d("!!!", "ComponentsView Restoring..." + prefix);
+		
+		super.components = new LinkedList<Component>();
+		
+		int size = saved.getInt(prefix + "size");
+		Log.d("!!!", "Got size: " + size);
+		
+		type = saved.getInt(prefix + "type");
+		operation = saved.getInt(prefix+"operation");
+		orientation = saved.getInt(prefix + "orientation");
+		double grab_point_x = saved.getDouble(prefix + "grab_point_x");
+		double grab_point_y = saved.getDouble(prefix + "grab_point_y");
+		grab_point = new Complex(grab_point_x, grab_point_y);
+		double angle = saved.getDouble(prefix + "angle");
+		
+		String child_prefix;
+		
+		for (int i = 0; i < size; i++)
+		{
+			child_prefix = prefix + Integer.toString(i);
+			@SuppressWarnings("unchecked")
+			LinkedList<Integer> child_prefix_ll = (LinkedList<Integer>) this.getSerialNumber().clone();
+			child_prefix_ll.add(i);
+			
+			Log.d("!!!", "Retrieving class type: " + child_prefix);
+			
+			String class_str = saved.getString(child_prefix + "class");
+			
+			if (class_str.equals(ComponentsView.class.toString()))
+			{
+				LinkedList<Component> dummi = new LinkedList<Component>();
+				
+				dummi.add(new Component(456));
+				
+				ComponentsView cv = new ComponentsView(parent, child_prefix_ll, dummi, operation, type);
+				
+				cv.restoreInstanceState(saved);
+				
+				super.components.add(cv);
+			}
+			else if (class_str.equals(ComponentView.class.toString()))
+			{
+				ComponentView c = new ComponentView(child_prefix_ll, null);
+				c.restoreInstanceState(saved);
+				
+				super.components.add(c);
+			}
+		}
+		
+		this.setXY(grab_point);
+		this.setAngle(angle);
+		
+		if (super.getOrientation() == PARALLEL)
+		{
+			init_parallel();
+		}
+
+		else if (super.getOrientation() == SERIES)
+		{
+			init_series();
+		}
+
 	}
 
-	public void setNext(ComponentViewInterface cvi)
-	{
-		next_comp = cvi;
-	}
+	public void setNext(ComponentViewInterface cvi) { next_comp = cvi; }
 	
 	@Override
 	public ComponentViewInterface getNext() {
@@ -293,9 +389,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 
 	@Override
-	public Complex getXY() {
-		return new Complex(grab_point.re, grab_point.im);
-	}	
+	public Complex getXY() { return new Complex(grab_point.re, grab_point.im); }	
 	
 	public float getWidth()
 	{
@@ -313,30 +407,21 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		return (float)height; 
 	}
 	
-	public float getStrokeWidth() {
-		return ComponentView.stroke_width;
-	}
+	public float getStrokeWidth() {	return ComponentView.stroke_width; }
 	
 	public ComponentViewInterface isIn(Complex pnt)
 	{
 		if (collapse)
 		{
-			if ( collapseView.isIn(pnt) != null )
-			{
-				//Log.d("!!!", "Returning Collapsed View: " +  this.toString());
-				return this;
-			}
+			if ( collapseView.isIn(pnt) != null ) { return this; }
+			
 			return null;
 		}
 		for (int i = 0; i < size(); i++)
 		{
 			ComponentViewInterface comp = this.getComponentView(i);
 			
-			if (comp.isIn(pnt) != null )
-			{
-				//Log.d("!!!", "Returning: " + comp.toString());
-				return comp.isIn(pnt); 
-			}
+			if (comp.isIn(pnt) != null ) { return comp.isIn(pnt); }
 		}
 		return null;
 	}
@@ -648,7 +733,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		//The case where it fits horizontally but not vertically
 		//The case where it doesn't fit horizontally and vertically doesn't matter
 		//The case where it's chillin'
-		if (this.orientation == super.SERIES)
+		if (this.orientation == SERIES)
 		{
 			ComponentViewInterface first = this.getComponentView(0);
 			Complex ret =  first.get_preferred_grab_point(starting_grab_point, 
@@ -667,4 +752,11 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				rotate180,
 				justRotated);
 	}
+	
+	@Override
+	public View getSettingsView(Context calling_view_context)
+	{
+		return null;
+	}
+
 }

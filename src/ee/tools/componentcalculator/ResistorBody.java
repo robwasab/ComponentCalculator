@@ -1,6 +1,7 @@
 package ee.tools.componentcalculator;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.graphics.Canvas;
@@ -42,11 +43,14 @@ class ResistorBody implements Body
 
 	private String tag = "Resistor Body";
 	
-	public ResistorBody(double value, int tolerance) throws ResistorException
+	LinkedList<Integer> serial;
+	
+	public ResistorBody(LinkedList<Integer> serial, double value, int tolerance) throws ResistorException
 	{
 		this.value = value;
 		this.tolerance = tolerance;
 		body_paint = new Paint();
+		this.serial = serial;
 		
 		this.x = 0;
 		this.y = 0;
@@ -93,11 +97,15 @@ class ResistorBody implements Body
 		recalculate();
 	}
 	
-	public void setValue(double value) throws ResistorException
+	public void setValue(double value)
 	{
-		this.value = value;
-		resistor_bands.setValue(value);
-		main_init();
+		try
+		{
+			resistor_bands.setValue(value);
+			this.value = value;			
+			main_init();
+		}
+		catch (ResistorException re) {}
 	}
 	
 	public void setValue(double value, int tolerance) throws ResistorException
@@ -233,6 +241,12 @@ class ResistorBody implements Body
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void setSerialNumber(LinkedList<Integer> serial)
+	{
+		this.serial = (LinkedList<Integer>)serial.clone();
+	}
+	
 	public boolean isIn(Complex pnt)
 	{
 		return InOrOut.inOrOut(outline, pnt);
@@ -255,7 +269,14 @@ class ResistorBody implements Body
 
 	@Override
 	public void saveInstanceState(Bundle state) {
-		String prefix = this.getClass().toString();
+		LinkedList<Integer> prefix_ints = this.serial;
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
+		Log.d("!!!", "ResistorBody Saving..."+prefix);
+		
 		state.putFloat(prefix + "x", this.x);
 		state.putFloat(prefix + "y", this.y);
 		state.putDouble(prefix + "value", this.value);
@@ -265,15 +286,20 @@ class ResistorBody implements Body
 
 	@Override
 	public void restoreInstanceState(Bundle saved) {
-		String prefix = this.getClass().toString();
+		LinkedList<Integer> prefix_ints = this.serial;
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
+		Log.d("!!!", "ResistorBody Restoring..."+prefix);
+		
 		this.x = saved.getFloat(prefix + "x");
 		this.y = saved.getFloat(prefix + "y");
 		double value = saved.getDouble(prefix + "value");
-		try {
-			this.setValue(value);
-		} catch (ResistorException e) 
-		{
-		}
+		
+		this.setValue(value);
+		
 		this.rotate.re = saved.getDouble(prefix + "rotate.re");
 		this.rotate.im = saved.getDouble(prefix + "rotate.im");
 		main_init();

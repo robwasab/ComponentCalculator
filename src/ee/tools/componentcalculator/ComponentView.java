@@ -3,11 +3,13 @@ import java.util.LinkedList;
 
 import ee.tools.model.EngNot;
 import ee.tools.model.Component;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 public class ComponentView extends Component implements ComponentViewInterface {
 	
@@ -252,28 +254,62 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	
 	public void saveInstanceState(Bundle state)
 	{
-		state.putFloat(tag+"origin_x", origin_x);
-		state.putFloat(tag+"origin_y", origin_y);
-		state.putDouble(tag+"rotate_re", rotate.re);
-		state.putDouble(tag+"rotate_im", rotate.im);
+		LinkedList<Integer> prefix_ints = this.getSerialNumber();
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
+		
+		Log.d("!!!", "ComponentView Saving..."+prefix + " " + this.getValue());
+		
+		state.putFloat(prefix+"origin_x", origin_x);
+		state.putFloat(prefix+"origin_y", origin_y);
+		state.putDouble(prefix+"rotate_re", rotate.re);
+		state.putDouble(prefix+"rotate_im", rotate.im);
+		state.putString(prefix+"class", this.getClass().toString());
+		state.putDouble(prefix+"value", super.getValue());
+		state.putInt(prefix+"qnty", super.getQnty());
+		
 		if (body != null)
 		{
+			state.putString(prefix+"type", body.getClass().toString());
 			body.saveInstanceState(state);
 		}
+		
 	}
 	
 	public void restoreInstanceState(Bundle saved)
 	{
-		String prefix = tag;
+		LinkedList<Integer> prefix_ints = this.getSerialNumber();
+		String prefix = "";
+		for (Integer i : prefix_ints)
+		{
+			prefix += i.toString();
+		}
+		Log.d("!!!", "ComponentView Restoring..."+prefix);
+		
 		this.origin_x = saved.getFloat(prefix + "origin_x");
 		this.origin_y = saved.getFloat(prefix + "origin_y");
 		this.rotate.re = saved.getDouble(prefix + "rotate_re");
 		this.rotate.im = saved.getDouble(prefix + "rotate_im");
-		recalculate();
-		if (body != null)
+		String type = saved.getString(prefix+"type");
+		super.setValue(saved.getDouble(prefix+"value"));
+		super.setQnty(saved.getInt(prefix+"qnty"));
+		if (type != null)
 		{
-			body.restoreInstanceState(saved);
+			if (type.equals(ResistorBody.class.toString()))
+			{
+				try {
+					this.body = new ResistorBody(this.getSerialNumber(), 123, 0);
+					this.body.restoreInstanceState(saved);
+				} catch (ResistorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
+		recalculate();
 	}
 	
 	public void setSerialNumber(LinkedList<Integer> serial) {
@@ -282,7 +318,15 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		{
 			this.serial.add(i);
 		}
+		if (body != null) body.setSerialNumber(serial);
 	}	
+	
+	@Override
+	public void setValue(double value)
+	{
+		super.setValue(value);
+		if (body != null) body.setValue(value);
+	}
 	
 	@Override
 	public LinkedList<Integer> getSerialNumber() {
@@ -346,5 +390,11 @@ public class ComponentView extends Component implements ComponentViewInterface {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public View getSettingsView(Context calling_view_context)
+	{
+		return new ComponentViewSettings(calling_view_context, this);
 	}
 }

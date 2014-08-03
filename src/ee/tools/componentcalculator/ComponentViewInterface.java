@@ -2,9 +2,11 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.View;
 
 public interface ComponentViewInterface {
 
@@ -58,6 +60,8 @@ public interface ComponentViewInterface {
 	//return the component that surrounds the pnt
 	//else return null
 	public ComponentViewInterface isIn(Complex pnt);
+	
+	public View getSettingsView(Context calling_view_context);
 	
 	//Recursive method
 	//See RecursiveSeriesDrawingUtility

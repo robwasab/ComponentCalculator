@@ -1,6 +1,7 @@
 package ee.tools.componentcalculator;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.graphics.Canvas;
@@ -83,6 +84,8 @@ public class Tap2SeeMoreBody implements Body{
 		recalculate();
 	}
 
+	public void setValue(double val) {}
+	
 	public void setAngle(double angle)
 	{
 		rotate.re = Math.cos(angle);
@@ -90,6 +93,7 @@ public class Tap2SeeMoreBody implements Body{
 		recalculate();
 	}
 	
+	public void setSerialNumber(LinkedList<Integer> serial ) {}
 	private void recalculate()
 	{
 		nw.re = 0; nw.im = 0;
