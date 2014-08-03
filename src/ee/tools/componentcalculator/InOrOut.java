@@ -1,7 +1,6 @@
 package ee.tools.componentcalculator;
 
 import java.util.List;
-import android.util.Log;
 
 public class InOrOut {
 

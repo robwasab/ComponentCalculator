@@ -198,10 +198,10 @@ class ResistorBody implements Body
 			rect[NE].im = 0;
 		
 			rect[SE].re = rect[NE].re;
-			rect[SE].im = this.body_height;
+			rect[SE].im = body_height;
 		
 			rect[SW].re = rect[NW].re;
-			rect[SW].im = this.body_height;
+			rect[SW].im = body_height;
 			
 			for (int j = 0; j < 4; j++)
 			{
@@ -219,7 +219,7 @@ class ResistorBody implements Body
 	
 	private void init_bands()
 	{
-		band_width = (int) ((this.body_width - (this.body_width * 0.1)) / num_bands);
+		band_width = (int) ((body_width - (body_width * 0.1)) / num_bands);
 		
 		padding = band_width / 6;
 		

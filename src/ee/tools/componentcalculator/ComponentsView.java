@@ -3,7 +3,6 @@ package ee.tools.componentcalculator;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -542,7 +541,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		{
 			Complex p11_prev = p11s.get(i-1);
 			
-			Complex p22_prev = p22s.get(i-1);
+			//Complex p22_prev = p22s.get(i-1);
 			
 			ComponentViewInterface prev_comp = getComponentView(i - 1);
 			
@@ -754,7 +753,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 	
 	@Override
-	public View getSettingsView(Context calling_view_context)
+	public View getSettingsView(Schematic call_back)
 	{
 		return null;
 	}

@@ -3,7 +3,6 @@ package ee.tools.componentcalculator;
 import ee.tools.model.Component;
 import android.app.Activity;
 import android.content.Context;
-import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,18 +19,25 @@ public class ComponentViewSettings extends LinearLayout implements OnKeyListener
 	
 	Component comp;
 	
-	public ComponentViewSettings(Context context, Component comp) 
+	Schematic call_back;
+	
+	public ComponentViewSettings(Schematic schematic, Component comp) 
 	{
-		super(context);
+		super(schematic.getContext());
 		super.setOrientation(HORIZONTAL);
 		LayoutParams params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 
 				LinearLayout.LayoutParams.WRAP_CONTENT);
 		super.setLayoutParams(params);
 		
-		current_activity = (Activity)context;
-		current_context  = context;
+		current_activity = (Activity)schematic.getContext();
+		current_context  = schematic.getContext();
 		
-		value_entry = new EditText(context);
+		this.call_back = schematic;
+		
+		value_entry = new EditText(schematic.getContext());
+		
+		value_entry.setLayoutParams(params);
+		
 		this.addView(value_entry);
 		
 		this.comp = comp;
@@ -45,7 +51,7 @@ public class ComponentViewSettings extends LinearLayout implements OnKeyListener
 
 	private void close_key_board(EditText edit_text)
 	{
-		InputMethodManager imm = (InputMethodManager) current_activity.getSystemService(current_activity.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) current_activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
 		imm.hideSoftInputFromWindow(edit_text.getWindowToken(), 0);
 	}
@@ -65,6 +71,7 @@ public class ComponentViewSettings extends LinearLayout implements OnKeyListener
 		   {
 			   Double d = Double.valueOf(value);
 			   comp.setValue(d);
+			   call_back.invalidate();
 		   }
 		   catch (Exception e)
 		   {

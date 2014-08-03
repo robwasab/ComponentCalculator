@@ -2,7 +2,6 @@ package ee.tools.componentcalculator;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 import ee.tools.componentcalculator.Complex;
 import ee.tools.componentcalculator.ComponentViewInterface;
 

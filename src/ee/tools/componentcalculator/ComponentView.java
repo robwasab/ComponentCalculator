@@ -3,7 +3,6 @@ import java.util.LinkedList;
 
 import ee.tools.model.EngNot;
 import ee.tools.model.Component;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -140,7 +139,7 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	public String getName() { return "SINGLE"; }
 	
 	public float getStrokeWidth() {
-		return this.stroke_width;
+		return stroke_width;
 	}
 	
 	public void setAngle(double angle)
@@ -184,12 +183,12 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		p11.re  = 0;
 		
 		float body_width = 0;
-		float body_height = 0;
+		//float body_height = 0;
 		
 		if (body != null)
 		{
 			body_width = body.getWidth();
-			body_height = body.getHeight();
+			//body_height = body.getHeight();
 			axial_length = body.getWidth() + 2 * this.text_width;
 		}
 		p12.re  = (float) (axial_length/2.0 - body_width/2.0);
@@ -275,8 +274,7 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		{
 			state.putString(prefix+"type", body.getClass().toString());
 			body.saveInstanceState(state);
-		}
-		
+		}	
 	}
 	
 	public void restoreInstanceState(Bundle saved)
@@ -393,8 +391,8 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	}
 	
 	@Override
-	public View getSettingsView(Context calling_view_context)
+	public View getSettingsView(Schematic call_back)
 	{
-		return new ComponentViewSettings(calling_view_context, this);
+		return new ComponentViewSettings(call_back, this);
 	}
 }

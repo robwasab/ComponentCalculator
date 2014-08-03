@@ -2,7 +2,6 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -61,7 +60,7 @@ public interface ComponentViewInterface {
 	//else return null
 	public ComponentViewInterface isIn(Complex pnt);
 	
-	public View getSettingsView(Context calling_view_context);
+	public View getSettingsView(Schematic call_back);
 	
 	//Recursive method
 	//See RecursiveSeriesDrawingUtility
