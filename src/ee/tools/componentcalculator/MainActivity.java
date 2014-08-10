@@ -20,9 +20,9 @@ public class MainActivity extends Activity{
 		
 		if (savedInstanceState == null) 
 		{
-		/*	getFragmentManager().beginTransaction()
-					.add(R.id.main_content, new FragmentSchematic()).commit();		
-		*/
+		getFragmentManager().beginTransaction()
+					.add(R.id.main_content, new SchematicFragment()).commit();		
+		
 		}
 	}
 	
@@ -40,9 +40,15 @@ public class MainActivity extends Activity{
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
+		
 		if (id == R.id.action_settings) {
 			return true;
 		}
-		return super.onOptionsItemSelected(item);
+		else if (id == android.R.id.home)
+		{
+			super.onBackPressed();
+			return true;
+		}
+    	return super.onOptionsItemSelected(item);
 	}
 }

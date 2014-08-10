@@ -1,15 +1,30 @@
 package ee.tools.componentcalculator;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.LinearLayout;
 import ee.tools.model.Component;
+
+/*
+ * All a Schematic does is draw a ComponentsView, and direct touch movements to it.
+ * It also asks its ComponentsView if there is a Component at an X,Y coord,
+ * If there is, then it get that Component and retrieves its Accessory. 
+ *   With the accessory, it asks if it is a View or an Intent.
+ *   If it is a View, it adds it to the settings_container, which is a view that displays settings.
+ *   If it is an Intent, it starts it. 
+ *   
+ *If a Schematic were to save itself, then it simply passes the Bundle to its ComponentsView.
+ *Schematic itself doesn't add any useful information to the saving process. 
+ */
 
 class Schematic extends SurfaceView
 {
@@ -24,12 +39,18 @@ class Schematic extends SurfaceView
 	ComponentsView series;
 		
 	LinearLayout settings_container;
-		
+
+	public Activity current_activity;
+	
+	SchematicFragment detail_schematic;
+	
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
 		super(context);
 		this.setBackgroundColor(Color.CYAN);
 		this.current_context = context;
+		this.current_activity = (Activity)context;
+		
 		this.settings_container = settings_container;
 		
 		invalidate();
@@ -77,16 +98,30 @@ class Schematic extends SurfaceView
 			ComponentViewInterface comp = series.isIn(pnt);
 			if (comp != null)
 			{
-				View settings = comp.getSettingsView(this);
+				Object accessory = comp.getAccessory(this);
 				
-				if (settings != null)
+				if (accessory != null)
 				{
-					settings_container.removeAllViews();
+					if (accessory.getClass() == ComponentViewSettings.class)
+					{
+						settings_container.removeAllViews();
 				
-					settings_container.addView(settings);
+						settings_container.addView((ComponentViewSettings)accessory);
 				
-					//double val = ((Component)comp).getValue();
-					Log.d("Schematic", ">>>" + ((Component)comp).toString());
+						//double val = ((Component)comp).getValue();
+						Log.d("Schematic", ">>>" + ((Component)comp).toString());
+					}
+					else if (accessory.getClass() == SchematicFragment.class)
+					{
+						detail_schematic = (SchematicFragment) accessory;
+						Log.d("Schematic", "Opening Detail Schematic...");
+						
+						android.app.FragmentManager f_manager = current_activity.getFragmentManager();
+						f_manager.beginTransaction()
+						.replace(R.id.main_content, detail_schematic)
+						.addToBackStack(null)
+						.commit();
+					}
 				}
 			}
 			break;
@@ -150,4 +185,6 @@ class Schematic extends SurfaceView
 		if (series != null)
 			series.draw(c);
 	}
+	
+	//class BackStackChangedListener implements FragmentManag
 }

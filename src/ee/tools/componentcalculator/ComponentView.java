@@ -391,7 +391,7 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	}
 	
 	@Override
-	public View getSettingsView(Schematic call_back)
+	public Object getAccessory(Schematic call_back)
 	{
 		return new ComponentViewSettings(call_back, this);
 	}

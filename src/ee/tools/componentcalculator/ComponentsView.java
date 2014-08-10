@@ -3,6 +3,7 @@ package ee.tools.componentcalculator;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -753,9 +754,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 	
 	@Override
-	public View getSettingsView(Schematic call_back)
+	public Object getAccessory(Schematic call_back)
 	{
-		return null;
+		SchematicFragment detailFragment = new SchematicFragment();
+		
+		detailFragment.setComponentsView(this);
+		
+		return detailFragment;
 	}
 
 }

@@ -60,7 +60,7 @@ public interface ComponentViewInterface {
 	//else return null
 	public ComponentViewInterface isIn(Complex pnt);
 	
-	public View getSettingsView(Schematic call_back);
+	public Object getAccessory(Schematic call_back);
 	
 	//Recursive method
 	//See RecursiveSeriesDrawingUtility
