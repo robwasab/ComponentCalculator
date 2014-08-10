@@ -1,9 +1,14 @@
 package ee.tools.componentcalculator;
 
-import android.app.Activity;
+import java.util.LinkedList;
+
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,20 +16,39 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 
-public class MainActivity extends Activity{
+public class MainActivity extends FragmentActivity{
 
+	SchematicFragment base;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		if (savedInstanceState == null) 
-		{
-		getFragmentManager().beginTransaction()
-					.add(R.id.main_content, new SchematicFragment()).commit();		
 		
+		FragmentManager fm = getSupportFragmentManager();
+
+		if (savedInstanceState == null)
+		{
+			base = new SchematicFragment();
+			fm.beginTransaction()
+			.replace(R.id.main_content, base).commit();		
+		}
+		else
+		{
+			FragmentManager man = this.getSupportFragmentManager();
+			base = (SchematicFragment) man.getFragment(savedInstanceState, "base_fragment");
 		}
 	}
+	
+	public void onSaveInstanceState(Bundle state)
+	{
+		super.onSaveInstanceState(state);
+		base.onSaveInstanceState(state);
+		FragmentManager man = this.getSupportFragmentManager();
+		man.putFragment(state, "base_fragment", base);
+	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -44,11 +68,12 @@ public class MainActivity extends Activity{
 		if (id == R.id.action_settings) {
 			return true;
 		}
+		
 		else if (id == android.R.id.home)
 		{
-			super.onBackPressed();
-			return true;
+			return base.backPressedAction();
 		}
+		
     	return super.onOptionsItemSelected(item);
 	}
 }

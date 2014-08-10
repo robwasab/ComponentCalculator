@@ -17,6 +17,8 @@
             android:name="ee.tools.componentcalculator.MainActivity"
             android:label="@string/app_name" 
             android:parentActivityName="default">
+            <!--android:configChanges="orientation|screenSize"-->
+            
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

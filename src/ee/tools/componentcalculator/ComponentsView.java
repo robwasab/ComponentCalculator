@@ -143,6 +143,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		collapseView = new ComponentView(this.getSerialNumber(), tapDat, this.getValue(), this.getQnty());
 	}
 	
+	public String toString() { return super.toString() + "\n   S/N: " + getSerialNumber().toString(); }
+	
 	@Override
 	public void setSerialNumber(LinkedList<Integer> serial) {
 		this.serial = new LinkedList<Integer>();
@@ -169,6 +171,38 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		return copy;
 	}
 
+	public ComponentViewInterface findBySerialNumber(LinkedList<Integer> search)
+	{
+		int this_serial_size = this.serial.size();
+		int i = 0;
+		
+		Log.d(tag, "Comparing this serial: " + this.serial.toString());
+		Log.d(tag, "            to search: " + search.toString());
+		
+		for ( ; i < this_serial_size; i++)
+		{
+			if (this.serial.get(i).intValue() != search.get(i).intValue() ) return null;
+		}
+		
+		if (this_serial_size == search.size()) 
+		{
+			Log.d(tag, "Same size, returning this element...");
+			return this;
+		}
+		
+		ComponentViewInterface cv = this.getComponentView(search.get(i).intValue());
+		ComponentsView c;
+		
+		if (cv.getClass() == ComponentsView.class)
+		{
+			c = (ComponentsView)cv;
+			return c.findBySerialNumber(search);
+		}
+		else
+		{
+			return null;
+		}
+	}
 	public void setXY(float x, float y)
 	{
 		this.grab_point.re = x; this.grab_point.im = y;
@@ -755,12 +789,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	
 	@Override
 	public Object getAccessory(Schematic call_back)
-	{
-		SchematicFragment detailFragment = new SchematicFragment();
-		
-		detailFragment.setComponentsView(this);
-		
-		return detailFragment;
+	{		
+		return this;
 	}
 
 }

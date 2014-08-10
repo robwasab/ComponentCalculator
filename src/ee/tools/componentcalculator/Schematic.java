@@ -1,12 +1,16 @@
 package ee.tools.componentcalculator;
 
+import java.util.LinkedList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -26,8 +30,10 @@ import ee.tools.model.Component;
  *Schematic itself doesn't add any useful information to the saving process. 
  */
 
-class Schematic extends SurfaceView
+class Schematic extends SurfaceView implements BackPressedListener
 {
+	String prefix = "schematic";
+	
 	Context current_context;
 	
 	final int INVALID_PNTR_ID = -1;
@@ -40,36 +46,95 @@ class Schematic extends SurfaceView
 		
 	LinearLayout settings_container;
 
-	public Activity current_activity;
+	FragmentActivity current_activity;
 	
-	SchematicFragment detail_schematic;
+	LinkedList<ComponentViewInterface> component_stack;
 	
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
 		super(context);
 		this.setBackgroundColor(Color.CYAN);
 		this.current_context = context;
-		this.current_activity = (Activity)context;
-		
+		this.current_activity = (FragmentActivity)context;
 		this.settings_container = settings_container;
 		
 		invalidate();
 	}
 	
-	public void setSeries(ComponentsView series) { this.series = series; }
+	public void setSeries(ComponentsView series) 
+	{
+		if (series == null) return;
+		this.series = series;
+		this.component_stack = new LinkedList<ComponentViewInterface>();
+		this.component_stack.add(series);
+	}
+	
+	public ComponentViewInterface getCurrent() 
+	{
+		if (this.component_stack == null) return null;
+		return this.component_stack.get(this.component_stack.size() - 1); 
+	}
 	
 	public ComponentsView getSeries() { return series; }
 	
 	public void saveInstanceState(Bundle state) 
 	{
 		if (series != null)
+		{
+			//save the serial numbers in component_stack
+			
+			state.putInt(prefix+"component_stack_size", component_stack.size());
+			
+			for (int i = 0; i < component_stack.size(); i++)
+			{
+				LinkedList<Integer> serial = this.component_stack.get(i).getSerialNumber();
+				
+				int[] serial_arr = new int[serial.size()];
+				
+				for (int j = 0; j < serial.size(); j++)
+				{
+					serial_arr[j] = serial.get(j).intValue();
+				}
+				state.putIntArray(prefix+"component_stack_element"+i, serial_arr);
+			}
 			series.saveInstanceState(state);
+		}
 	}
 
 	public void restoreInstanceState(Bundle state)
 	{
 		if (series != null)
+		{
 			series.restoreInstanceState(state);
+			
+			this.setSeries(series);
+			
+			int component_stack_size = state.getInt(prefix + "component_stack_size");
+			
+			for (int i = 0; i < component_stack_size; i++)
+			{
+				String key = prefix + "component_stack_element"+i;
+				int[] s_array = state.getIntArray(key);
+				LinkedList<Integer> search_serial = new LinkedList<Integer>();
+				for (int element: s_array) search_serial.add(element);
+				
+				Log.d(prefix, "Searching for: " + search_serial.toString());
+				
+				ComponentViewInterface cv = series.findBySerialNumber(search_serial);
+				
+				if (cv != null)
+				{
+					Log.d(prefix, "Found: " + cv.toString());
+				
+					component_stack.add(series.findBySerialNumber(search_serial));
+				}
+				else Log.d(prefix, "Got null...");
+			}
+			getCurrent().setXY(0,0);
+			getCurrent().setAngle(0.0);
+			getCurrent().setCollapse(false);
+			invalidate();
+		}
 	}
 	
 	private float distance(float i_x, float i_y, float f_x, float f_y) 
@@ -83,9 +148,13 @@ class Schematic extends SurfaceView
 	{
 		super.onTouchEvent(me);
 
-		if (series == null) return false;
+		if (this.component_stack.size() < 1) return false;
+		
+		if (this.getCurrent() == null) return false;
 
 		int action = me.getActionMasked();
+		
+		ComponentViewInterface CURRENT = this.getCurrent();
 		
 		switch(action)
 		{
@@ -95,7 +164,8 @@ class Schematic extends SurfaceView
 			pntr1 = me.getPointerId(0);
 			
 			Complex pnt = new Complex(i_x, i_y);
-			ComponentViewInterface comp = series.isIn(pnt);
+			ComponentViewInterface comp = CURRENT.isIn(pnt);
+			
 			if (comp != null)
 			{
 				Object accessory = comp.getAccessory(this);
@@ -108,19 +178,15 @@ class Schematic extends SurfaceView
 				
 						settings_container.addView((ComponentViewSettings)accessory);
 				
-						//double val = ((Component)comp).getValue();
 						Log.d("Schematic", ">>>" + ((Component)comp).toString());
 					}
-					else if (accessory.getClass() == SchematicFragment.class)
+					else if (accessory instanceof ComponentViewInterface)
 					{
-						detail_schematic = (SchematicFragment) accessory;
-						Log.d("Schematic", "Opening Detail Schematic...");
-						
-						android.app.FragmentManager f_manager = current_activity.getFragmentManager();
-						f_manager.beginTransaction()
-						.replace(R.id.main_content, detail_schematic)
-						.addToBackStack(null)
-						.commit();
+						ComponentViewInterface detail_comp = (ComponentViewInterface) accessory;
+						component_stack.add(detail_comp);
+						detail_comp.setAngle(0.0);
+						detail_comp.setCollapse(false);
+						invalidate();
 					}
 				}
 			}
@@ -138,7 +204,7 @@ class Schematic extends SurfaceView
 					
 					Log.d("!!!", "STARTING!");
 				
-					series.setXY((float)move.re, (float)move.im);
+					CURRENT.setXY((float)move.re, (float)move.im);
 					
 					i_x = f_x;
 					i_y = f_y;
@@ -149,19 +215,6 @@ class Schematic extends SurfaceView
 			{
 				pntr2_x = me.getX(pntr2);
 				pntr2_y = me.getY(pntr2);
-				//float dy = pntr2_y - i_y;
-				//float dx = pntr2_x - i_x;
-				//double angle = Math.atan(dy/dx);
-				
-				/*
-				if (Math.abs(parallel.rotation.phase() - angle) > 0.02)
-				{
-					if (dx < 0) angle += Math.PI;
-						
-					//parallel.setAngle(angle);
-					//Log.d(tag, Double.toString(angle));
-				}
-				*/
 			}
 			break;
 			
@@ -178,13 +231,23 @@ class Schematic extends SurfaceView
 		}
 		return true;
 	}
-				
+	
 	public void onDraw(Canvas c)
 	{
 		super.onDraw(c);
-		if (series != null)
-			series.draw(c);
+		if (getCurrent() != null)
+			getCurrent().draw(c);
+	}
+
+	@Override
+	public boolean backPressedAction() {
+		if (this.component_stack.size() > 1)
+		{
+			this.component_stack.removeLast();
+			invalidate();
+			return true;
+		}
+		return false;
 	}
 	
-	//class BackStackChangedListener implements FragmentManag
 }

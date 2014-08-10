@@ -63,6 +63,8 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		move_body();
 	}
 	
+	public String toString() { return super.toString() + "\n   S/N: " + getSerialNumber().toString(); }
+	
 	private void move_body() {
 		if (body != null )
 		{
