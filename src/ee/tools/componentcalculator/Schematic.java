@@ -130,9 +130,9 @@ class Schematic extends SurfaceView implements BackPressedListener
 				}
 				else Log.d(prefix, "Got null...");
 			}
+			getCurrent().setCollapse(false);
 			getCurrent().setXY(0,0);
 			getCurrent().setAngle(0.0);
-			getCurrent().setCollapse(false);
 			invalidate();
 		}
 	}
@@ -184,8 +184,9 @@ class Schematic extends SurfaceView implements BackPressedListener
 					{
 						ComponentViewInterface detail_comp = (ComponentViewInterface) accessory;
 						component_stack.add(detail_comp);
-						detail_comp.setAngle(0.0);
 						detail_comp.setCollapse(false);
+						detail_comp.setXY(0,0);
+						detail_comp.setAngle(0.0);
 						invalidate();
 					}
 				}

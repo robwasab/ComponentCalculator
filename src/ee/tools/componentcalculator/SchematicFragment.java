@@ -124,7 +124,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 		root_layout.addView(settings);
 		
 		root_layout.addView(schematic);
-		
+			
 		return rootView;
 	}
 
