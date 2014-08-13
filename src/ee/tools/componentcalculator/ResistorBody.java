@@ -270,7 +270,7 @@ class ResistorBody implements Body
 	@Override
 	public void saveInstanceState(Bundle state) {
 		LinkedList<Integer> prefix_ints = this.serial;
-		String prefix = "";
+		String prefix = "Body";
 		for (Integer i : prefix_ints)
 		{
 			prefix += i.toString();
@@ -287,7 +287,7 @@ class ResistorBody implements Body
 	@Override
 	public void restoreInstanceState(Bundle saved) {
 		LinkedList<Integer> prefix_ints = this.serial;
-		String prefix = "";
+		String prefix = "Body";
 		for (Integer i : prefix_ints)
 		{
 			prefix += i.toString();

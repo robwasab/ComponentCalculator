@@ -60,6 +60,8 @@ public interface ComponentViewInterface {
 	//else return null
 	public ComponentViewInterface isIn(Complex pnt);
 	
+	public boolean isCollapsed();
+	
 	public Object getAccessory(Schematic call_back);
 	
 	//Recursive method

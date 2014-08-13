@@ -49,6 +49,7 @@ class Schematic extends SurfaceView implements BackPressedListener
 	FragmentActivity current_activity;
 	
 	LinkedList<ComponentViewInterface> component_stack;
+	LinkedList<ComponentSettings> settings_stack;
 	
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
@@ -57,7 +58,7 @@ class Schematic extends SurfaceView implements BackPressedListener
 		this.current_context = context;
 		this.current_activity = (FragmentActivity)context;
 		this.settings_container = settings_container;
-		
+		this.settings_stack = new LinkedList<ComponentSettings>();
 		invalidate();
 	}
 	
@@ -97,6 +98,14 @@ class Schematic extends SurfaceView implements BackPressedListener
 				}
 				state.putIntArray(prefix+"component_stack_element"+i, serial_arr);
 			}
+			
+			state.putInt(prefix+"settings_stack_size", settings_stack.size());
+			
+			for (int i = 0; i < settings_stack.size(); i++)
+			{
+				String settings_prefix = prefix + "ComponentSettings" + i;
+				settings_stack.get(i).saveInstanceState(settings_prefix, state);
+			}
 			series.saveInstanceState(state);
 		}
 	}
@@ -107,10 +116,15 @@ class Schematic extends SurfaceView implements BackPressedListener
 		{
 			series.restoreInstanceState(state);
 			
-			this.setSeries(series);
+			component_stack = new LinkedList<ComponentViewInterface>();
 			
 			int component_stack_size = state.getInt(prefix + "component_stack_size");
 			
+			if (1 < component_stack_size)
+				this.current_activity.getActionBar().setDisplayHomeAsUpEnabled(true);
+			else
+				this.current_activity.getActionBar().setDisplayHomeAsUpEnabled(false);
+	
 			for (int i = 0; i < component_stack_size; i++)
 			{
 				String key = prefix + "component_stack_element"+i;
@@ -130,9 +144,22 @@ class Schematic extends SurfaceView implements BackPressedListener
 				}
 				else Log.d(prefix, "Got null...");
 			}
+			
+			settings_stack.removeAll(settings_stack);
+			
+			int settings_stack_size = state.getInt(prefix+"settings_stack_size");
+			
+			for (int i = 0; i < settings_stack_size; i++)
+			{
+				String settings_prefix = prefix + "ComponentSettings" + i;
+				ComponentSettings setting = new ComponentSettings();
+				setting.restoreInstanceState(settings_prefix, state);
+				settings_stack.add(setting);
+			}
+			
 			getCurrent().setCollapse(false);
-			getCurrent().setXY(0,0);
 			getCurrent().setAngle(0.0);
+			getCurrent().setXY(0,0);
 			invalidate();
 		}
 	}
@@ -184,9 +211,20 @@ class Schematic extends SurfaceView implements BackPressedListener
 					{
 						ComponentViewInterface detail_comp = (ComponentViewInterface) accessory;
 						component_stack.add(detail_comp);
+						
+						ComponentSettings detail_settings = new ComponentSettings();
+						detail_settings.collapsed = detail_comp.isCollapsed();
+						detail_settings.rotation  = detail_comp.getAngle();
+						detail_settings.xy        = detail_comp.getXY();
+						
+						settings_stack.add(detail_settings);
+						
 						detail_comp.setCollapse(false);
 						detail_comp.setXY(0,0);
 						detail_comp.setAngle(0.0);
+						
+						this.current_activity.getActionBar().setDisplayHomeAsUpEnabled(true);
+
 						invalidate();
 					}
 				}
@@ -237,18 +275,58 @@ class Schematic extends SurfaceView implements BackPressedListener
 	{
 		super.onDraw(c);
 		if (getCurrent() != null)
+		{
 			getCurrent().draw(c);
+		}
+			
 	}
 
 	@Override
 	public boolean backPressedAction() {
 		if (this.component_stack.size() > 1)
 		{
+			ComponentSettings restore = settings_stack.getLast();
+			getCurrent().setXY(restore.xy);
+			getCurrent().setAngle(restore.rotation);
+			getCurrent().setCollapse(restore.collapsed);
 			this.component_stack.removeLast();
+			this.settings_stack.removeLast();
+			
+			getCurrent().setCollapse(false);
+			getCurrent().setAngle(0.0);
+			getCurrent().setXY(0,0);
+
+			if (this.component_stack.size() == 1)
+				this.current_activity.getActionBar().setDisplayHomeAsUpEnabled(false);
+
 			invalidate();
 			return true;
 		}
 		return false;
+	}
+	
+	class ComponentSettings
+	{
+		boolean collapsed;
+		Complex xy;
+		double rotation;
+		
+		void saveInstanceState(String prefix, Bundle b)
+		{
+			b.putBoolean(prefix+"collapsed", collapsed);
+			b.putDouble(prefix+"x", xy.re);
+			b.putDouble(prefix+"y", xy.im);
+			b.putDouble(prefix+"rotation", rotation);
+		}
+		
+		void restoreInstanceState(String prefix, Bundle b)
+		{
+			collapsed = b.getBoolean(prefix+"collapsed");
+			double x = b.getDouble(prefix+"x");
+			double y = b.getDouble(prefix+"y");
+			xy = new Complex(x,y);
+			rotation = b.getDouble(prefix+"rotation");
+		}
 	}
 	
 }

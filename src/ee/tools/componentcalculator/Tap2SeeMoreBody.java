@@ -55,7 +55,8 @@ public class Tap2SeeMoreBody implements Body{
 		recalculate();
 	}
 	
-	public float getWidth() { return body_width; }
+	public float getWidth() 
+	{ return body_width; }
 
 	public float getHeight() { return body_height; }
 

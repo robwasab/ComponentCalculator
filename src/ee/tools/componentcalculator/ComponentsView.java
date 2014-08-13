@@ -106,7 +106,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 					}
 					else if (type == CAPACITOR)
 					{
-					
+					   b = new CapacitorBody(next_serial);
 					}
 					ComponentView cv = new ComponentView(next_serial, b, c.getValue(), c.getQnty());
 					
@@ -176,9 +176,6 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		int this_serial_size = this.serial.size();
 		int i = 0;
 		
-		Log.d(tag, "Comparing this serial: " + this.serial.toString());
-		Log.d(tag, "            to search: " + search.toString());
-		
 		for ( ; i < this_serial_size; i++)
 		{
 			if (this.serial.get(i).intValue() != search.get(i).intValue() ) return null;
@@ -186,7 +183,6 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		
 		if (this_serial_size == search.size()) 
 		{
-			Log.d(tag, "Same size, returning this element...");
 			return this;
 		}
 		
@@ -427,9 +423,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	
 	public float getWidth()
 	{
-		if (collapse) { return collapseView.getWidth(); }
+		if (collapse) { 
+			Log.d(tag, "Collapsed returning: " + collapseView.getWidth());
+			return collapseView.getWidth();
+		}
 		
 		if (this.getOrientation() == SERIES) { return this.series_width(); }
+		
 		return (float)this.width;
 	}
 	
@@ -442,6 +442,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	}
 	
 	public float getStrokeWidth() {	return ComponentView.stroke_width; }
+	
+	public boolean isCollapsed() { return this.collapse; }
 	
 	public ComponentViewInterface isIn(Complex pnt)
 	{
@@ -508,12 +510,11 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		for (int i = 0; i < size(); i++)
 		{
 			ComponentViewInterface cv = getComponentView(i);
-			
+				
 			height += cv.getHeight();
 			
 			//if this isn't the last element, then add the padding
 			if (i != (super.components.size() - 1)) { height += padding; }
-			
 			
 			cv.setCollapse(false);
 			//test to see if this component's width, in addition to the current grab_point.re
@@ -529,8 +530,14 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			}
 			
 			cv.setCollapse(should_collapse);
+		    Log.d(tag, "Should Collapse? " + should_collapse);	
 			
-			if (cv.getWidth() > width) { width = cv.getWidth(); }
+		    Log.d(tag, "Component :" + i + " width: " + cv.getWidth());
+			
+			if (cv.getWidth() > width) 
+			{
+				width = cv.getWidth(); 
+			}
 		}
 		
 		//calculate the drawing origin with no rotation 
@@ -664,6 +671,9 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		
 		float i2_x = (float) p22s.get(0).re;
 		float i2_y = (float)(p22s.get(0).im - first_view.getStrokeWidth()/2.0);
+		
+		c.drawLine((float)p11s.get(0).re, (float)p11s.get(0).im, (float)p12s.get(0).re, (float)p12s.get(0).im, p); 
+		c.drawLine((float)p21s.get(0).re, (float)p21s.get(0).im, (float)p22s.get(0).re, (float)p22s.get(0).im, p); 
 		
 		if (size() <= 1) return;
 		

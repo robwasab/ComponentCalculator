@@ -118,11 +118,13 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	
 	public float getWidth() 
 	{
-		return (float)axial_length;
+		recalculate();
+		return (float)(axial_length);
 	}
 	
 	public float getHeight() 
 	{
+		recalculate();
 		if (body != null )
 		{
 			return (float)body.getHeight(); 
@@ -192,6 +194,9 @@ public class ComponentView extends Component implements ComponentViewInterface {
 			body_width = body.getWidth();
 			//body_height = body.getHeight();
 			axial_length = body.getWidth() + 2 * this.text_width;
+			
+			Log.d("ComponentView", "Calculated Axial length" + axial_length);
+			Log.d("ComponentView", "body_width: " + body.getWidth());
 		}
 		p12.re  = (float) (axial_length/2.0 - body_width/2.0);
 		p11.im  = 0;
@@ -304,9 +309,13 @@ public class ComponentView extends Component implements ComponentViewInterface {
 					this.body = new ResistorBody(this.getSerialNumber(), 123, 0);
 					this.body.restoreInstanceState(saved);
 				} catch (ResistorException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+			else if (type.equals(CapacitorBody.class.toString()))
+			{
+				this.body = new CapacitorBody(this.getSerialNumber());
+				this.body.restoreInstanceState(saved);
 			}
 		}
 		recalculate();
@@ -391,6 +400,8 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		}
 		return null;
 	}
+	
+	public boolean isCollapsed() { return false; }
 	
 	@Override
 	public Object getAccessory(Schematic call_back)

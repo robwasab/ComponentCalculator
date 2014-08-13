@@ -54,7 +54,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		pager.setAdapter(tab_adapter);
 		
 		this.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
+		this.getActionBar().setDisplayHomeAsUpEnabled(false);
 		for (String tab_name : tab_names)
 		{
 			this.getActionBar().addTab(getActionBar().newTab().setText(tab_name).setTabListener(this));

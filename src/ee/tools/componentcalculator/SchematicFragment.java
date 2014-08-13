@@ -52,8 +52,6 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				
 		View rootView = inflater.inflate(R.layout.schematic_fragment, container, false);
 		
-		this.getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-		
 		current_context  = this.getActivity();
 		
 		current_activity = this.getActivity();
@@ -69,12 +67,29 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 		
 		LinkedList<Integer> base_serial = new LinkedList<Integer>();
 		base_serial.add(0);
+		/*
+		LinkedList<Component> series_1 = new LinkedList<Component>();
+		series_1.add(new Component(123));
+		series_1.add(new Component(456));
+		series_1.add(new Component(789));
 		
-			
+		Components series_11 = new Components(series_1, Components.SUM);
+		
+		LinkedList<Component> parallel_1 = new LinkedList<Component>();
+		
+		parallel_1.add(new Component(12300000));
+		parallel_1.add(new Component(45600000));
+		parallel_1.add(new Component(78900000));
+		parallel_1.add(series_11);
+		
+		Components parallel_11 = new Components(parallel_1, Components.INVERSE_INVERSE_SUM);
+		
 		LinkedList<Component> small_series_ll = new LinkedList<Component>();
 		
 		small_series_ll.add(new Component(456));
 		small_series_ll.add(new Component(789));
+		small_series_ll.add(parallel_11);
+		
 		
 		ComponentsView small_series = new ComponentsView(
 				schematic,
@@ -113,7 +128,49 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				s,
 				Components.SUM,
 				Components.RESISTOR);
+        */
+		LinkedList<Component> ll_s0 = new LinkedList<Component>();
+		ll_s0.add(new Component(4E-3));
+		ll_s0.add(new Component(5E-3));
+		ll_s0.add(new Component(6E-3));
+		ll_s0.add(new Component(7E-3));
+	
+		ComponentsView s0 = new ComponentsView(
+				schematic,
+				base_serial,
+				ll_s0,
+				Components.INVERSE_INVERSE_SUM,
+				Components.CAPACITOR);
+				
+		LinkedList<Component> ll_p1 = new LinkedList<Component>();		
+		ll_p1.add(new Component(1E-6));
+		ll_p1.add(new Component(2E-6));
+		ll_p1.add(s0);
+		ll_p1.add(new Component(3E-6));
+		
+		ComponentsView p1 = new ComponentsView(
+				schematic,
+				base_serial,
+				ll_p1,
+				Components.SUM,
+				Components.CAPACITOR);
+		
+		LinkedList<Component> ll_s1 = new LinkedList<Component>();
+		
+		ll_s1.add(new Component(.01E-6));
+		ll_s1.add(new Component(.1E-6));
+		ll_s1.add(new Component(1));
+		ll_s1.add(p1);
+		ll_s1.add(new Component(12E-12));
+		
+		ComponentsView first_comp = new ComponentsView(
+				schematic,
+				base_serial,
+				ll_s1,
+				Components.INVERSE_INVERSE_SUM,
+				Components.CAPACITOR);
 
+		
 		schematic.setSeries(first_comp);
 		
 		if (savedInstanceState != null) 
