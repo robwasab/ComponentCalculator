@@ -258,6 +258,7 @@ class Schematic extends SurfaceView implements BackPressedListener
 			break;
 			
 			case MotionEvent.ACTION_UP:
+				Log.d(prefix, CURRENT.toString());
 				pntr1 = INVALID_PNTR_ID;
 				break;
 			case MotionEvent.ACTION_POINTER_DOWN:

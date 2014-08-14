@@ -25,7 +25,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 	SchematicFragment schematic;
 	InventoryFragment inventory;
-	ViewPager pager;
+	NonSwipeableViewPager pager;
 	
 	String[] tab_names = {"Schematic", "Inventory" };
 	
@@ -35,7 +35,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		
 		setContentView(R.layout.activity_main);
 		
-		pager = (ViewPager) this.findViewById(R.id.pager);
+		pager = (NonSwipeableViewPager) this.findViewById(R.id.pager);
+		pager.setPagingEnabled(false);
 		
 		TabPagerAdapter tab_adapter = new TabPagerAdapter(getSupportFragmentManager());
 		
@@ -97,29 +98,37 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			return schematic.backPressedAction();
 		}
-		
     	return super.onOptionsItemSelected(item);
 	}
 
+	public void onBackPressed()
+	{
+		if (schematic.backPressedAction()) return;
+		super.onBackPressed();
+	}
+	
 	class TabPagerAdapter extends FragmentPagerAdapter
 	{
-
+		
 		public TabPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
-		
+			
 		@Override
 		public Fragment getItem(int index) {
 		 
+			Fragment ret = null;
+			
 			switch (index) {
 				case 0:
-				return schematic;
-		        
+				ret = schematic;
+		        break;
 				case 1:
-				// Games fragment activity
-				return inventory;
+				ret = inventory;
+				break;
 			}
-			return null;
+					
+			return ret;
 		}
 		 
 		@Override

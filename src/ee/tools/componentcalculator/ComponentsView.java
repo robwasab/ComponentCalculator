@@ -143,7 +143,10 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		collapseView = new ComponentView(this.getSerialNumber(), tapDat, this.getValue(), this.getQnty());
 	}
 	
-	public String toString() { return super.toString() + "\n   S/N: " + getSerialNumber().toString(); }
+	public String toString() 
+	{
+	   return this.to_string( 3 * this.getSerialNumber().size() );   
+	}
 	
 	@Override
 	public void setSerialNumber(LinkedList<Integer> serial) {
@@ -394,6 +397,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				
 				super.components.add(c);
 			}
+			this.collapseView.setValue(this.getValue());
 		}
 		
 		this.setXY(grab_point);
@@ -424,7 +428,6 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	public float getWidth()
 	{
 		if (collapse) { 
-			Log.d(tag, "Collapsed returning: " + collapseView.getWidth());
 			return collapseView.getWidth();
 		}
 		
@@ -530,10 +533,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			}
 			
 			cv.setCollapse(should_collapse);
-		    Log.d(tag, "Should Collapse? " + should_collapse);	
-			
-		    Log.d(tag, "Component :" + i + " width: " + cv.getWidth());
-			
+		 	
 			if (cv.getWidth() > width) 
 			{
 				width = cv.getWidth(); 

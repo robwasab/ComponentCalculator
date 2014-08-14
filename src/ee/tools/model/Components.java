@@ -128,27 +128,33 @@ public class Components extends Component {
 		return;
 	}
 	
-	public String toString()
+	public String toString() { return to_string(3); }
+	
+	public String to_string(int num_indent)
 	{
 		String ret = null;
+		
+		String indent = "";
+		
+		for (int i = 0; i < num_indent; i++) indent += " ";
 		
 		switch(operation)
 		{
 		case SUM:
-			ret = "SUM: " + this.getValue() + "\n{\n";;
+			ret = "SUM: " + this.getValue() + "\n";
 			break;
 		case INVERSE_INVERSE_SUM:
-			ret = "INVERSE INVERSE SUM: " + this.getValue() + "\n{\n";;
+			ret = "INVERSE INVERSE SUM: " + this.getValue() + "\n";;
 			break;
 		}
 		
 		int i = 1;
 		for (Component c: components)
 		{
-			ret = ret + "   " + i + ". " + c.toString() + "\n";
+			ret = ret + indent + i + ". " + c.toString() + "\n";
 			i++;
 		}
-		return ret + "}\n";
+		return ret + "\n";
 	}
 	
 	public int getType() { return type; }

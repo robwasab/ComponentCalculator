@@ -63,7 +63,7 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		move_body();
 	}
 	
-	public String toString() { return super.toString() + "\n   S/N: " + getSerialNumber().toString(); }
+	public String toString() { return super.toString(); }
 	
 	private void move_body() {
 		if (body != null )
@@ -195,8 +195,6 @@ public class ComponentView extends Component implements ComponentViewInterface {
 			//body_height = body.getHeight();
 			axial_length = body.getWidth() + 2 * this.text_width;
 			
-			Log.d("ComponentView", "Calculated Axial length" + axial_length);
-			Log.d("ComponentView", "body_width: " + body.getWidth());
 		}
 		p12.re  = (float) (axial_length/2.0 - body_width/2.0);
 		p11.im  = 0;
