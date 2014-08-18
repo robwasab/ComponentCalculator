@@ -526,13 +526,23 @@ public class ComponentsView extends Components implements ComponentViewInterface
 			boolean should_collapse;
 			if (0 <= this.rotation.re)
 			{
-				should_collapse = (this.parent.getWidth() < (this.grab_point.re + cv.getWidth()) );				
+				//Log.d(tag, "Orientation ->");
+				should_collapse = (this.parent.getWidth() < (this.grab_point.re + cv.getWidth()) );	
+				//Log.d(tag, this.parent.getWidth() + " < " + (this.grab_point.re + cv.getWidth()));				
 			}
 			else
 			{
+				//Log.d(tag, "Orientation <-");
 				should_collapse = ( this.grab_point.re < cv.getWidth() );
+				//Log.d(tag, this.grab_point.re + " < " + cv.getWidth());
 			}
-			
+			/*
+			Log.d(tag, "Should Collapse: " + should_collapse);
+			Log.d(tag, "Parent Width   : " + this.parent.getWidth());
+			Log.d(tag, "Grab Point RE  : " + this.grab_point.re);
+			Log.d(tag, "Component Width: " + cv.getWidth());
+			Log.d(tag,  cv.getSerialNumber().toString());
+			*/
 			cv.setCollapse(should_collapse);
 		 	
 			if (cv.getWidth() > width) 

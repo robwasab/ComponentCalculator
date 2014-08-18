@@ -304,42 +304,7 @@ public class Schematic extends SurfaceView implements BackPressedListener
 	public void onDraw(Canvas c)
 	{
 		super.onDraw(c);
-		GraphPaperDrawer.draw(c);
-		
-		if (getCurrent() != null)
-		{
-			if (fit_component_to_screen == false)
-			{
-				getCurrent().draw(c);
-			}
-			else 
-			{
-				getCurrent().resetShrink();
-				do
-				{
-					if (getCurrent().getClass() == ComponentsView.class)
-					{
-						ComponentsView csv = (ComponentsView) getCurrent();
-						if (csv.getOrientation() == ComponentsView.SERIES)
-							csv.easy_series_arrange(c);
-						else
-							csv.setXY(0, csv.getHeight()/2);
-					}
-					else
-						getCurrent().setXY(0, getCurrent().getHeight()/2);
-
-					float lowest_y = getCurrent().get_lowest_y();
-					
-					if (lowest_y < c.getHeight())
-					{
-						break;
-					}
-				} while(getCurrent().shrink());
-				
-				getCurrent().draw(c);
-			}
-		}
-			
+		ComponentDrawingUtility.draw(getCurrent(), c, this.fit_component_to_screen);
 	}
 
 	@Override

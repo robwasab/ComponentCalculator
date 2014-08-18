@@ -1,14 +1,14 @@
 package ee.tools.componentcalculator;
 
-import java.util.LinkedList;
 
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
-import ee.tools.model.Component;
 import android.content.Context;
 import android.text.TextUtils.TruncateAt;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
@@ -26,6 +26,7 @@ public class InventoryListItemView extends RelativeLayout implements Checkable{
 		ComponentViewInterface component_view;
 		Schematic schematic;
 		boolean checked = false;
+		private String tag = "InventoryListItemView";
 		
 		InventoryListItemView(Context context, ComponentViewInterface component_view) 
 		{
@@ -50,17 +51,21 @@ public class InventoryListItemView extends RelativeLayout implements Checkable{
 			
 			text_view.setText(component_view.toString()); 
 			
-			layout  = (LinearLayout) this.findViewById(R.id.inventory_list_item_layout);
+			layout  = (LinearLayout) this.findViewById(R.id.inventory_schematic_holder);
 			
 			schematic = new Schematic(context, layout);
 			
 			schematic.setSeries(component_view);
 			
-			schematic.getHolder().setFixedSize(layout.getWidth(), (int)component_view.getHeight());
+			LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			schematic.setLayoutParams(params);
+			
+			schematic.getHolder().setFixedSize((int)component_view.getWidth(), (int)component_view.getHeight());
 			
 			schematic.setEnabled(false);
-			
+		
 			layout.addView(schematic);
+			
 		}
 		
 		public void setAdapter(BaseAdapter adapter)
@@ -84,7 +89,7 @@ public class InventoryListItemView extends RelativeLayout implements Checkable{
 			this.text_view.invalidate();
 			if (this.adapter != null) this.adapter.notifyDataSetChanged();
 		}
-
+		
 		private void expandView() {
 			text_view.setEllipsize(null);
 			text_view.setMaxLines(Integer.MAX_VALUE);
