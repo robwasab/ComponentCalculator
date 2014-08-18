@@ -2,6 +2,7 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
+import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
 import ee.tools.model.Components;
 import android.app.Activity;
@@ -67,7 +68,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 		
 		LinkedList<Integer> base_serial = new LinkedList<Integer>();
 		base_serial.add(0);
-		/*
+		
 		LinkedList<Component> series_1 = new LinkedList<Component>();
 		series_1.add(new Component(123));
 		series_1.add(new Component(456));
@@ -86,10 +87,9 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 		
 		LinkedList<Component> small_series_ll = new LinkedList<Component>();
 		
-		small_series_ll.add(new Component(456));
 		small_series_ll.add(new Component(789));
 		small_series_ll.add(parallel_11);
-		
+		small_series_ll.add(new Component(456));
 		
 		ComponentsView small_series = new ComponentsView(
 				schematic,
@@ -99,9 +99,9 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				Components.RESISTOR);
 		
 		LinkedList<Component> parallel_ll = new LinkedList<Component>();
-		
-		parallel_ll.add(small_series);
+	
 		parallel_ll.add(new Component(1230000));
+		parallel_ll.add(small_series);
 		parallel_ll.add(new Component(567000));
 		
 		ComponentsView parallel = new ComponentsView(
@@ -128,7 +128,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				s,
 				Components.SUM,
 				Components.RESISTOR);
-        */
+        /*
 		LinkedList<Component> ll_s0 = new LinkedList<Component>();
 		ll_s0.add(new Component(4E-3));
 		ll_s0.add(new Component(5E-3));
@@ -169,8 +169,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				ll_s1,
 				Components.INVERSE_INVERSE_SUM,
 				Components.CAPACITOR);
-
-		
+		*/
 		schematic.setSeries(first_comp);
 		
 		if (savedInstanceState != null) 

@@ -16,6 +16,10 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.LinearLayout;
+import ee.tools.componentcalculator.components_toolbox.Complex;
+import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
+import ee.tools.componentcalculator.components_toolbox.ComponentViewSettings;
+import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
 
 /*
@@ -30,7 +34,7 @@ import ee.tools.model.Component;
  *Schematic itself doesn't add any useful information to the saving process. 
  */
 
-class Schematic extends SurfaceView implements BackPressedListener
+public class Schematic extends SurfaceView implements BackPressedListener
 {
 	String prefix = "schematic";
 	
@@ -42,7 +46,7 @@ class Schematic extends SurfaceView implements BackPressedListener
 	float i_x, i_y, f_x, f_y;
 	float pntr2_x, pntr2_y;
 		
-	ComponentsView series;
+	ComponentViewInterface series;
 		
 	LinearLayout settings_container;
 
@@ -50,6 +54,8 @@ class Schematic extends SurfaceView implements BackPressedListener
 	
 	LinkedList<ComponentViewInterface> component_stack;
 	LinkedList<ComponentSettings> settings_stack;
+
+	private boolean fit_component_to_screen;
 	
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
@@ -62,7 +68,7 @@ class Schematic extends SurfaceView implements BackPressedListener
 		invalidate();
 	}
 	
-	public void setSeries(ComponentsView series) 
+	public void setSeries(ComponentViewInterface series) 
 	{
 		if (series == null) return;
 		this.series = series;
@@ -70,13 +76,16 @@ class Schematic extends SurfaceView implements BackPressedListener
 		this.component_stack.add(series);
 	}
 	
+	public void setFitToScreen(boolean fit)
+	{
+		fit_component_to_screen = fit;
+	}
+	
 	public ComponentViewInterface getCurrent() 
 	{
 		if (this.component_stack == null) return null;
 		return this.component_stack.get(this.component_stack.size() - 1); 
 	}
-	
-	public ComponentsView getSeries() { return series; }
 	
 	public void saveInstanceState(Bundle state) 
 	{
@@ -134,13 +143,17 @@ class Schematic extends SurfaceView implements BackPressedListener
 				
 				Log.d(prefix, "Searching for: " + search_serial.toString());
 				
-				ComponentViewInterface cv = series.findBySerialNumber(search_serial);
+				ComponentViewInterface cv = null;
+				
+				if (series.getClass() == ComponentsView.class)
+					cv = ((ComponentsView)series)
+						.findBySerialNumber(search_serial);
 				
 				if (cv != null)
 				{
 					Log.d(prefix, "Found: " + cv.toString());
 				
-					component_stack.add(series.findBySerialNumber(search_serial));
+					component_stack.add(cv);
 				}
 				else Log.d(prefix, "Got null...");
 			}
@@ -173,15 +186,31 @@ class Schematic extends SurfaceView implements BackPressedListener
 		
 	public boolean onTouchEvent(MotionEvent me)
 	{
+		if (!this.isEnabled()) return false;
+		
 		super.onTouchEvent(me);
-
+		
 		if (this.component_stack.size() < 1) return false;
 		
 		if (this.getCurrent() == null) return false;
 
+		int pntr_count = me.getPointerCount();
+		
 		int action = me.getActionMasked();
 		
 		ComponentViewInterface CURRENT = this.getCurrent();
+		
+		switch(pntr_count)
+		{
+		case 2:
+			CURRENT.shrink();
+			invalidate();
+			return true;
+		case 3:
+			CURRENT.resetShrink();
+			invalidate();
+			return true;
+		}
 		
 		switch(action)
 		{
@@ -275,9 +304,40 @@ class Schematic extends SurfaceView implements BackPressedListener
 	public void onDraw(Canvas c)
 	{
 		super.onDraw(c);
+		GraphPaperDrawer.draw(c);
+		
 		if (getCurrent() != null)
 		{
-			getCurrent().draw(c);
+			if (fit_component_to_screen == false)
+			{
+				getCurrent().draw(c);
+			}
+			else 
+			{
+				getCurrent().resetShrink();
+				do
+				{
+					if (getCurrent().getClass() == ComponentsView.class)
+					{
+						ComponentsView csv = (ComponentsView) getCurrent();
+						if (csv.getOrientation() == ComponentsView.SERIES)
+							csv.easy_series_arrange(c);
+						else
+							csv.setXY(0, csv.getHeight()/2);
+					}
+					else
+						getCurrent().setXY(0, getCurrent().getHeight()/2);
+
+					float lowest_y = getCurrent().get_lowest_y();
+					
+					if (lowest_y < c.getHeight())
+					{
+						break;
+					}
+				} while(getCurrent().shrink());
+				
+				getCurrent().draw(c);
+			}
 		}
 			
 	}
