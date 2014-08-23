@@ -34,7 +34,7 @@ import ee.tools.model.Component;
  *Schematic itself doesn't add any useful information to the saving process. 
  */
 
-public class Schematic extends SurfaceView implements BackPressedListener
+public class Schematic extends View implements BackPressedListener
 {
 	String prefix = "schematic";
 	

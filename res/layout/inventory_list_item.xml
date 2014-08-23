@@ -24,59 +24,38 @@
 		    >
 		    
 		<LinearLayout
-		    android:padding="20dp"
+		    android:padding="5dp"
 		    android:id="@+id/inventory_schematic_holder"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:orientation="vertical"
+		    android:gravity="center_vertical" 
+		    android:layout_weight = "1"
 		    />
 
-		<!-- Divider     
-		<View
-    		android:layout_width="1dp"
-   			android:layout_height="match_parent"
-  		  	android:background="@color/dark" />
-		-->
 		<LinearLayout
-		    android:padding="20dp"
+		    android:id= "@+id/number_incrementor_holder"
+		    android:padding="5dp"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:orientation="vertical"
-			>
-
-			<TextView
-			    android:id="@+id/inventory_quantity_spinner_label"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_weight="1"
-			    android:text="QNTY"
-			    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-			<NumberPicker
-			    android:id="@+id/numberPicker1"
-			    android:layout_width="30dp"
-			    android:layout_height="50dp"
-			    android:layout_gravity="center"
-			    android:gravity="fill_vertical|fill_horizontal" />
-		    
+		    android:gravity="center_vertical"
+		    android:layout_weight = "1"
+		    >
+		
 		</LinearLayout>	
 		
-		<!-- Divider     
-		<View
-    		android:layout_width="1dp"
-   			android:layout_height="match_parent"
-  		  	android:background= "@color/dark"
-  		  	/>
-		-->
 		<LinearLayout
-		    android:padding="20dp"
+		    android:padding="5dp"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:orientation="vertical"
+		    android:gravity="center_vertical" 
+		    android:layout_weight="1"
 		    >
 		    
 		    <TextView
-			    android:id="@+id/inventory_quantity_spinner_label"
+		        android:gravity="center_vertical"
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
 			    android:layout_weight="1"
@@ -84,15 +63,15 @@
 			    android:textAppearance="?android:attr/textAppearanceSmall" />
 		
 			<CheckBox
-		    	android:id="@+id/inventory_check_box"
+			 	android:gravity="center_vertical"
+			 	android:layout_weight = "1"
+             	android:id="@+id/inventory_check_box"
 		    	android:layout_width="wrap_content"
 		    	android:layout_height="wrap_content" />
 			
 		</LinearLayout>
 		    
 	</TableRow>
-			
-		
 		
 	</TableLayout>
     

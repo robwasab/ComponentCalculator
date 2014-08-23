@@ -36,6 +36,7 @@ public class InventoryFragment extends ListFragment {
 		
 		//this.getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		
+		//this.registerForContextMenu(this.getListView());
 	}
 	
 	InventoryListItemView last_item = null;
