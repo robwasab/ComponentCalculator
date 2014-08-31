@@ -57,6 +57,18 @@ public class Component implements Comparable<Component>{
 	
 	public String toString() {return Double.toString(this.val);}
 	
+	private static String space(int spaces)
+	{
+		String space = "";
+		for (int i = 0; i < spaces; i++) space += " ";
+		return space;
+	}
+
+	public String toString(int indent)
+	{
+		return space(indent) + this.toString();
+	}
+	
  	public int getQnty() {	return qnty;	}
 
  	public void setQnty(int qnty) {	this.qnty = qnty;	}

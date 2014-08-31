@@ -3,27 +3,67 @@ package ee.tools.model;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import ee.tools.componentcalculator.Log;
+
 public class Approximator {
 
-	public static int precision_ones_place = 5;
+	public static double precision = 0.1; //0.01, 0.001, 0.0001, 0.00001...
+	
+	public static double default_tolerance = 1;
+	public static int maximum_number_inverse_inverse_components = 5;
+	public static String recurse_tag = "Approximator";
 	
 	public static Components approximate(LinkedList<Component> comps, Component target)
 	{
+		Log.blackList.add(recurse_tag);
 		Component[] seq = comps.toArray(new Component[0]);
 		Arrays.sort(seq);
-		return sum_recurse(seq, target.clone());
+		double fractional_error = 0.01;
+		
+		Components ret = sum_recurse(seq, target.clone(), 0, 0, fractional_error, target.getValue());
+		
+		Log.blackList.removeLast();
+		return ret;
 	}
 	
-	private static Components sum_recurse(Component[] comps, Component target)
+	private static String space(int spaces)
 	{
+		String space = "";
+		for (int i = 0; i < spaces; i++) space += " ";
+		return space;
+	}
+	
+	
+	@SuppressWarnings("unused")
+	private static Components sum_recurse(Component[] comps, Component target,
+			int depth, int parent_depth, double fractional_error, double original_target)
+	{
+		if (50 < depth) 
+		{
+			Log.d(recurse_tag, space(depth + parent_depth) + "depth too large... returning***");
+			return null;
+		}
+		
 		int index = BinarySearch.search(comps, target);
 		
 		Component found = comps[index];
 		
+		Log.d(recurse_tag, found.toString(depth+parent_depth));
+		
 		target = target.subtract(found);
 		
-		if (target.lessThan(new Component(0.0))) 
+		double range = original_target * fractional_error;
+		
+		if (Math.abs(target.getValue()) <= range)
 		{
+			Log.d(recurse_tag,  space(parent_depth + depth) + "RETURNING");
+			Components c = new Components(null, Components.SUM);
+			c.add(found);
+			return c;
+		}
+		
+		if (target.lessThan(new Component(0.0))) 
+		{			
 			Components c = new Components(null, Components.SUM);
 			//here's where you should start the parallel approximation
 			//make sure you pass the "found" Component to the parallel approximator
@@ -33,82 +73,193 @@ public class Approximator {
 			//undo subtracting the found value 
 			target = target.add(found);
 			
-			Components inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found);
+			double new_range = Math.abs(fractional_error * original_target - target.getValue());
 			
-			inv_inv_sum_res.add(found);
+			found = comps[index];
+
+			int new_parent_depth = depth + parent_depth;
+			/*
+			Log.d(tag, space(parent_depth + depth) + "STARTING INVERSE DIVE...");
+			Log.d(tag, space(parent_depth + depth) + "Using Index: " + index);
+			Log.d(tag, space(parent_depth + depth) + "       BASE: " + found.getValue());
+			Log.d(tag, space(parent_depth + depth) + "     TARGET: " + target.getValue());
+			*/
+			Components inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found, 1, new_parent_depth, new_range);
+			/*	   
+			Log.d(tag, space(parent_depth + depth) + "***FOUND:");
+			Log.d(tag, inv_inv_sum_res.toString(parent_depth + depth));
+			*/
 			
-			c.add(inv_inv_sum_res);
+			Components smallest = inv_inv_sum_res;
 			
-			//If the inverse_inverse_sum under approximates target
-			//You can still add series resistors to get closer to the target
-			//Recursively call sum_recurse again
-			//Asking for the new marginal value
+			int smallest_length = 0;
 			
-			if(inv_inv_sum_res.lessThan(target) && (Math.abs(target.getValue() - inv_inv_sum_res.getValue()) > precision_ones_place))
+			if (smallest != null)
 			{
-				Component new_target = new Component( target.getValue() - inv_inv_sum_res.getValue() );
+				smallest_length = inv_inv_sum_res.getLength();
 				
-				Components another_result = sum_recurse(comps, new_target);
-				c.add(another_result);
-			}		
+				inv_inv_sum_res.add(found);
+			}
+			
+			for (int i = index + 1; i < comps.length; i++)
+			{
+				found = comps[i];
+				
+				Log.d(recurse_tag, space(parent_depth + depth) + "STARTING INVERSE DIVE...");
+				Log.d(recurse_tag, space(parent_depth + depth) + "Using Index: " + i);
+				Log.d(recurse_tag, space(parent_depth + depth) + "       BASE: " + found.getValue());
+				Log.d(recurse_tag, space(parent_depth + depth) + "     TARGET: " + target.getValue());
+
+				inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found, 1, new_parent_depth, new_range);
+			
+				if (inv_inv_sum_res == null) continue;
+			
+				inv_inv_sum_res.add(found);
+				
+				Log.d(recurse_tag, space(parent_depth + depth) + "***FOUND:");
+				
+				Log.d(recurse_tag, inv_inv_sum_res.toString(parent_depth + depth));
+				
+				if (inv_inv_sum_res.getLength() < smallest_length)
+				{
+					Log.d(recurse_tag, space(parent_depth + depth) + "smallest so far...");
+					
+					smallest_length = inv_inv_sum_res.getLength();
+					
+					smallest = inv_inv_sum_res;
+				}
+			}
+			
+			if (smallest == null) 
+			{
+				return null;
+			}
+			
+			c.add(smallest);
+			
 			return c;
 		}
-		Components c = sum_recurse(comps, target);
+		
+		Components c = sum_recurse(comps, target, depth + 1, parent_depth, fractional_error, original_target);
+		
+		if (c == null) return null;
+		
 		c.add(found);
+		
 		return c;
 	}
 	
-	private static Components inverse_inverse_sum_recurse(Component[] comps, Component target, Component base_comp)
+	private static Components inverse_inverse_sum_recurse
+		(Component[] comps, Component target, Component base_comp, int depth, int parent_depth, double range)
 	{
 		Component numerator = target.multiply(base_comp);
 		Component denom     = base_comp.subtract(target);
 		Component desired   = numerator.divide(denom);
 		
-		//System.out.println("GOING FOR: " + desired);
+		String indent = space(parent_depth + depth);
 		
-		int index = BinarySearch.search(comps, desired);
+		boolean stop = false;
 		
-		Component found = comps[index];
+		double desired_threshold 
+		= precision/4.0 * (4.0 * base_comp.getValue() * base_comp.getValue() / (precision * precision) - 1 );
 		
-		//System.out.println("FOUND: " + found);
+		if (base_comp.lessThan(target)) stop |= true;
 		
+		if (desired_threshold < desired.getValue()) stop |= true;
+		
+		Log.d(recurse_tag, indent + "Desire: " + desired.getValue());
+		
+		if (stop)
+		{
+			Log.d(recurse_tag, indent + "INVERSE RETURNING");
+			return new Components(null, Components.INVERSE_INVERSE_SUM);
+		}
+		
+		//if the desired component is larger than the smallest one in our inventory, 
+		//Then try to approximate it using sum_recurse
+		Component found;
+	
+		if (desired.lessThan(comps[0]))
+		{
+			//Then it is the smallest one youve got;
+			found = comps[0];
+		}
+		else 
+		{
+			Log.d(recurse_tag, space(parent_depth + depth) + "Starting SUM dive!");
+			Log.d(recurse_tag, space(parent_depth + depth) + "Looking for: " + desired.toString());
+			//also try finding the range of acceptable series components
+			//we know what we need
+			double target_value = target.getValue();
+			double desired_value = desired.getValue();
+			double base_value = base_comp.getValue();
+			double low, high, low_res, high_res, low_diff, high_diff;
+			double new_range = 0;
+			do
+			{
+				low = desired_value - new_range;
+				high = desired_value + new_range;
+				
+				low_res  = base_value * low / (base_value + low);
+				high_res = base_value * high / (base_value + high);
+				/*
+				Log.d(tag, indent+"   Desired Value: " + desired_value);
+				Log.d(tag, indent+"             LOW: " + low);
+				Log.d(tag, indent+"            HIGH: " + high);
+				Log.d(tag, indent+"          TARGET: " + target_value);
+				Log.d(tag, indent+"         LOW_RES: " + low_res);
+				Log.d(tag, indent+"        HIGH_RES: " + high_res);
+				*/
+				high_diff = Math.abs(high_res - target_value);
+				low_diff  = Math.abs(target_value - low_res );
+				/*
+				Log.d(tag, indent+" HIGH DIFFERENCE: " + high_diff);
+				Log.d(tag, indent+"  LOW DIFFERENCE: " + high_diff);
+				Log.d(tag, indent+"           RANGE: " + range);
+				Log.d(tag, indent+"       NEW RANGE: " + new_range);
+				*/
+				if ( high_diff > range)
+					break;
+				if ( low_diff > range)
+					break;
+				new_range += 0.01;
+			} while(true);
+			
+			double fractional_error = new_range/desired_value;
+			Log.d(recurse_tag, space(parent_depth + depth)+"fractional_error: " + fractional_error);
+			found = sum_recurse(comps, desired, 1, parent_depth + depth, fractional_error, desired.getValue());
+		}
+		
+		if (found == null)
+		{
+			Log.d(recurse_tag, space(parent_depth + depth) + "SUM_RECURSE RETURNED NULL");
+			return null;
+		}
+		
+		Log.d(recurse_tag, found.toString(parent_depth + depth));
+				
 		//Calculate the resulting value
 		double current_val = base_comp.getValue();
+		
 		double found_val   = found.getValue();
 		
 		//Product Over Sum to Calculate New Parallel Resistance
 		Component new_base_comp = new Component(current_val * found_val / (current_val + found_val));
 		
-		//System.out.println("RESULTING RESISTANCE: " + new_base_comp);
-		
-		if (new_base_comp.lessThan(target))
+		/*AM I CLOSE ENOUGH?*/
+		if (Math.abs((new_base_comp.getValue() - target.getValue())) <= range)
 		{
-			/*Here is when to stop the recursion
-			  Here you have a choice:
-			  -Do you return found?
-			  -Or do you neglect found?
-			*/
-			double original_p_error = percent_error(target, base_comp);
-			double new_p_error      = percent_error(target, new_base_comp);
-			
-			if (Math.abs(original_p_error) < Math.abs(new_p_error))
-			{
-				//Don't include the found component
-				return new Components(null, Components.INVERSE_INVERSE_SUM);
-			}
-			else
-			{
-				//Include the found component
-				Components ret = new Components(null, Components.INVERSE_INVERSE_SUM);
-				ret.add(found);
-				return ret;
-			}
+			Components ret = new Components(null, Components.INVERSE_INVERSE_SUM);
+			ret.add(found);
+			return ret;
 		}
 		
-		//System.out.println(found + " " + new_base_comp + " TARGET: " + target);
+		Components c = inverse_inverse_sum_recurse(comps, target, new_base_comp, depth + 1, parent_depth, range);
 		
-		Components c = inverse_inverse_sum_recurse(comps, target, new_base_comp);
+		if (c == null) return null;
+		
 		c.add(found);
+		
 		return c;
 	}
 	

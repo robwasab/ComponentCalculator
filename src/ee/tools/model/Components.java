@@ -55,6 +55,7 @@ public class Components extends Component {
 	public static double inverse_inverse_sum(List<Component> comps)
 	{
 		double val = 0;
+		if (comps.size() < 1) return -1;
 		
 		for (Component c: comps)
 		{
@@ -66,9 +67,24 @@ public class Components extends Component {
 		return val;
 	}
 	
+	public int getLength()
+	{
+		int length = 0;
+		for (int i = 0; i < components.size(); i++)
+		{
+			if (components.get(i) instanceof Components)
+			{
+				length += ((Components)components.get(i)).getLength();
+			}
+			else length += 1;
+		}
+		return length;
+	}
+	
 	public static double sum(List<Component> comps)
 	{
 		double val = 0;
+		if (comps.size() < 1) return -1;
 		
 		for (Component c: comps)
 		{
@@ -130,6 +146,8 @@ public class Components extends Component {
 	
 	public String toString() { return to_string(3); }
 	
+	public String toString(int num_indent) { return to_string(num_indent); }
+	
 	public String to_string(int num_indent)
 	{
 		String ret = null;
@@ -141,10 +159,10 @@ public class Components extends Component {
 		switch(operation)
 		{
 		case SUM:
-			ret = "SUM: " + this.getValue() + "\n";
+			ret = indent + "SUM: " + this.getValue() + "\n";
 			break;
 		case INVERSE_INVERSE_SUM:
-			ret = "INVERSE INVERSE SUM: " + this.getValue() + "\n";;
+			ret = indent + "INVERSE INVERSE SUM: " + this.getValue() + "\n";;
 			break;
 		}
 		

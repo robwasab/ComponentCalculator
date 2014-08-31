@@ -5,4 +5,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="default_text">Hello World! List Item</string>
+    <string name="calculator_string_qnty_option">Take QNTY into Account?</string>
+    <string name="calculator_string_instructions">
+        Enter Desired Value:
+    </string>
+    <string name="calculator_string_find_combinations">
+        Find Combinations
+    </string>
+    <string name="calculator_string_resistor">Resistor</string>
+       <string name="calculator_string_capacitor">Capacitor</string>
+    
 </resources>

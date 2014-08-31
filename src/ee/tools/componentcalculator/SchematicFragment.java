@@ -20,11 +20,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.os.Bundle;
 
 /*
@@ -41,25 +44,36 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 	
 	Schematic schematic;
 	
-	SchematicFragment next_fragment;
+	TextView fit, reset;
+	private CalculatorFragment calculator_fragment;
+	private InventoryFragment inventory_fragment ;
 	
 	public SchematicFragment() 
 	{ super(); }
+	
+	public void onActivityCreated(Bundle state)
+	{
+		super.onActivityCreated(state);
+	}
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
 	{
 		super.onCreateView(inflater, container, savedInstanceState);
 				
-		View rootView = inflater.inflate(R.layout.schematic_fragment, container, false);
-		
-		current_context  = this.getActivity();
+		current_context = this.getActivity();
 		
 		current_activity = this.getActivity();
 		
+		View rootView = inflater.inflate(R.layout.schematic_fragment, container, false);
+				
 		root_layout = (LinearLayout) rootView.findViewById(R.id.schematic_layout);
 		
 		settings = new LinearLayout(current_context);
+		
+		fit = (TextView) rootView.findViewById(R.id.fit_text_view);
+		
+		reset = (TextView) rootView.findViewById(R.id.reset_text_view);
 		
 		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		settings.setLayoutParams(params);
@@ -112,9 +126,8 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				Components.RESISTOR);
 		
 		LinkedList<Component> s = new LinkedList<Component>();
-		
-		s.add(new Component(123));
 		s.add(parallel);
+		s.add(new Component(123));
 		s.add(new Component(47000));
 		s.add(new Component(1000));
 		
@@ -179,11 +192,45 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				
 		root_layout.addView(settings);
 		
+		schematic.setLayoutParams(params);
+		
 		root_layout.addView(schematic);
-			
+		
+		init_text_view_listeners();
+		
 		return rootView;
 	}
 
+	private void init_text_view_listeners() {
+		fit.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if (schematic.getCurrent() != null)
+				{
+					schematic.getCurrent().shrink();
+					schematic.invalidate();
+				}
+			}	
+		});
+		
+		reset.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if (schematic.getCurrent() != null)
+				{
+					schematic.getCurrent().resetShrink();
+					schematic.invalidate();
+				}
+			}	
+		});	
+	}
+
+	public void setFragments(InventoryFragment iF, CalculatorFragment cF)
+	{
+		this.calculator_fragment = cF;
+		this.inventory_fragment  = iF;
+	}
+	
 	public void onSaveInstanceState(Bundle save)
 	{
 		super.onSaveInstanceState(save);

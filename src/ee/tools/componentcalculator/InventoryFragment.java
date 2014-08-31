@@ -2,6 +2,7 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
+import ee.tools.componentcalculator.components_toolbox.ComponentView;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
@@ -17,18 +18,34 @@ public class InventoryFragment extends ListFragment {
 	
 	InventoryListAdapter component_adapter;
 	
+	LinkedList<ComponentViewInterface> views;
+
+	private SchematicFragment schematic_fragment;
+
+	private CalculatorFragment calculator_fragment;
+	
 	@Override
 	public void onActivityCreated(Bundle saved)
 	{
 		super.onActivityCreated(saved);
 		
 		LinkedList<Component> values = new LinkedList<Component>();
-		for (double i = 1.1; i <= 5.5; i += 0.1)
+		
+		values.add(new Component(10));
+
+		values.add(new Component(47));
+
+		for (double i = 1; i <= 10; i += 1)
 		{
 			Component c = new Component((int)(i * 100));
 			values.add(c);
 		}
-		LinkedList<ComponentViewInterface> views = ComponentViewFactory.makeViews(ComponentsView.RESISTOR, values);
+		for (double i = 1; i <= 5; i += 1)
+		{
+			Component c = new Component((int)(i * 2000));
+			values.add(c);
+		}
+		views = ComponentViewFactory.makeViews(ComponentsView.RESISTOR, values);
 		
 		InventoryListAdapter adapter = new InventoryListAdapter(this.getActivity(), views);
 		
@@ -39,6 +56,27 @@ public class InventoryFragment extends ListFragment {
 		//this.registerForContextMenu(this.getListView());
 	}
 	
+	public LinkedList<Component> getComponents()
+	{
+		LinkedList<Component> ret = new LinkedList<Component>();
+		
+		for (int i = 0; i < views.size(); i++)
+		{
+			if (views.get(i) instanceof Component)
+			{
+				//ret.add((Component)views.get(i));
+				ret.add(new Component(((Component)views.get(i)).getValue()));
+			}
+		}
+		return ret;
+	}
+	
+	public void setFragments(SchematicFragment sF, CalculatorFragment cF)
+	{
+		this.schematic_fragment = sF;
+		this.calculator_fragment = cF;
+	}
+
 	InventoryListItemView last_item = null;
 	private String tag = "InventoryFragment";
 	

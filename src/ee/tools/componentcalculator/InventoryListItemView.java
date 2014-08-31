@@ -4,6 +4,7 @@ package ee.tools.componentcalculator;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.model.Component;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -99,6 +100,11 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 		
 			layout.addView(schematic);
 			
+		}
+		
+		public void setMediaPlayer(MediaPlayer button_sound_player)
+		{
+			this.incrementor.setMediaPlayer(button_sound_player);
 		}
 		
 		public void setAdapter(BaseAdapter adapter)

@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -56,7 +59,7 @@ public class Schematic extends View implements BackPressedListener
 	LinkedList<ComponentSettings> settings_stack;
 
 	private boolean fit_component_to_screen;
-	
+		
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
 		super(context);
@@ -200,18 +203,6 @@ public class Schematic extends View implements BackPressedListener
 		
 		ComponentViewInterface CURRENT = this.getCurrent();
 		
-		switch(pntr_count)
-		{
-		case 2:
-			CURRENT.shrink();
-			invalidate();
-			return true;
-		case 3:
-			CURRENT.resetShrink();
-			invalidate();
-			return true;
-		}
-		
 		switch(action)
 		{
 		case MotionEvent.ACTION_DOWN:
@@ -258,6 +249,10 @@ public class Schematic extends View implements BackPressedListener
 					}
 				}
 			}
+			else
+			{
+				settings_container.removeAllViews();
+			}
 			break;
 					
 		case MotionEvent.ACTION_MOVE:
@@ -288,6 +283,8 @@ public class Schematic extends View implements BackPressedListener
 			
 			case MotionEvent.ACTION_UP:
 				Log.d(prefix, CURRENT.toString());
+				Log.d("!!!", "X: " + f_x +" Y: " + f_y);
+				
 				pntr1 = INVALID_PNTR_ID;
 				break;
 			case MotionEvent.ACTION_POINTER_DOWN:
@@ -353,6 +350,5 @@ public class Schematic extends View implements BackPressedListener
 			xy = new Complex(x,y);
 			rotation = b.getDouble(prefix+"rotation");
 		}
-	}
-	
+	}	
 }

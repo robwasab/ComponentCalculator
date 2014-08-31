@@ -34,6 +34,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	private LinkedList<Complex> p21s, p22s;
 	
 	private final static int padding = 20;
+	
 	double height = 0.0, width = 0.0;
 	
 	/*
@@ -83,10 +84,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				
 				Component c = comps.get(i);
 				
+				Log.d(tag, "TYPE: " +  c.getClass().toString());
+				
 				if (c instanceof ComponentViewInterface) 
 				{
-					super.add(comps.get(i)); 
-					((ComponentViewInterface)comps.get(i)).setSerialNumber(next_serial);
+					super.add(c); 
+					((ComponentViewInterface)c).setSerialNumber(next_serial);
+					
 				}
 				
 				else if (c.getClass() == Component.class)
@@ -110,7 +114,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 					   b = new CapacitorBody(next_serial);
 					}
 					ComponentView cv = new ComponentView(next_serial, b, c.getValue(), c.getQnty());
-					
+					Log.d(tag, "MADE A:");
+					Log.d(tag, cv.toString());
 					super.add(cv);
 					//swap the old Component pointer with a new ComponentView
 					//This way, when the user attempts to modify the Component, he will modify
@@ -121,7 +126,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 				{
 					Components foo = (Components) c;
 					ComponentsView csv = new ComponentsView(
-							parent, next_serial, foo.components, foo.operation, foo.type);
+							parent, next_serial, foo.components, foo.operation, type);
 					super.add(csv);
 					comps.set(i, csv);
 				}
@@ -130,11 +135,13 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		
 		if (super.getOrientation() == PARALLEL)
 		{
+			Log.d(tag, "Initing parallel...");
 			init_parallel();
 		}
 
 		else if (super.getOrientation() == SERIES)
 		{
+			Log.d(tag, "Initing series...");
 			init_series();
 		}
 		
@@ -499,7 +506,7 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		p.setColor(Color.BLACK);
 		p.setStrokeWidth(ComponentView.stroke_width);
 		next = new Complex(0,0);
-		
+		if (size() < 1) return;
 		update_parallel_values();
 		rotate_parallel_points();
 		update_next();		

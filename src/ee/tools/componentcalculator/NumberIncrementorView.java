@@ -2,6 +2,7 @@ package ee.tools.componentcalculator;
 
 import ee.tools.model.Component;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ public class NumberIncrementorView extends LinearLayout{
 	int val = 0;
 	Component component;
 	Context context;
+	MediaPlayer player;
 	
 	public NumberIncrementorView(Context context) {
 		super(context);
@@ -68,6 +70,7 @@ public class NumberIncrementorView extends LinearLayout{
 				{
 					decrement.setVisibility(INVISIBLE);
 				}
+				//if (player != null) player.start();
 			}
 		});
 		increment.setOnClickListener(new OnClickListener(){
@@ -81,10 +84,16 @@ public class NumberIncrementorView extends LinearLayout{
 				{
 					decrement.setVisibility(VISIBLE);
 				}
+				//if (player != null) player.start();
 			}
 		});
-
 	}
+	
+	public void setMediaPlayer(MediaPlayer player)
+	{
+		this.player = player;
+	}
+	
 	public void setComponent(Component c)
 	{
 		this.component = c;

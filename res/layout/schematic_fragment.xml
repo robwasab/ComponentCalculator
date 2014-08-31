@@ -1,9 +1,51 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/schematic_layout"
+    android:layout_gravity="center"
     android:orientation="vertical"
-    tools:context="ee.tools.componentcalculator.SchematicActivity"
-    >       
-</LinearLayout>
+    tools:context="ee.tools.componentcalculator.SchematicActivity" >
+	<TableRow 
+	    android:id="@+id/schematic_table_row"
+	    android:layout_width = "match_parent"
+	    android:layout_height = "wrap_content"
+	    >
+	   
+        <TextView
+            android:textAlignment="center"
+            android:id="@+id/fit_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:text="F I T"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:clickable="true"
+            android:typeface="normal" />
+
+        <TextView
+            android:textAlignment="center"
+            android:id="@+id/reset_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:text="R E S E T"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:clickable="true"
+            android:typeface="normal" />
+	    	    
+	</TableRow>
+	
+    <LinearLayout
+        android:layout_below="@id/schematic_table_row"
+        android:id="@+id/schematic_layout"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:layout_gravity="center"
+    	android:orientation="vertical"
+    />
+	
+</RelativeLayout>

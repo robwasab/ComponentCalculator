@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -13,21 +12,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 , ViewPager.OnPageChangeListener{
 
 	SchematicFragment schematic;
 	InventoryFragment inventory;
+	CalculatorFragment calculator;
+	
 	NonSwipeableViewPager pager;
 	
-	String[] tab_names = {"Schematic", "Inventory" };
+	String[] tab_names = {"Schematic", "Inventory", "Calculator" };
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,21 +34,28 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		
 		pager = (NonSwipeableViewPager) this.findViewById(R.id.pager);
 		pager.setPagingEnabled(false);
-		
+		pager.setOffscreenPageLimit(3);
 		TabPagerAdapter tab_adapter = new TabPagerAdapter(getSupportFragmentManager());
 		
 		if (savedInstanceState == null)
 		{
-			schematic = new SchematicFragment();
-			inventory = new InventoryFragment();
+			schematic  = new SchematicFragment();
+			inventory  = new InventoryFragment();
+			calculator = new CalculatorFragment();
+			schematic.setFragments(inventory, calculator);
+			inventory.setFragments(schematic, calculator);
+			calculator.setFragments(schematic, inventory);
 		}
 		else
 		{
 			FragmentManager man = this.getSupportFragmentManager();
-			schematic = (SchematicFragment) man.getFragment(savedInstanceState, "schematic_fragment");
-			inventory = (InventoryFragment) man.getFragment(savedInstanceState, "inventory_fragment");
+			schematic  = (SchematicFragment)  man.getFragment(savedInstanceState, "schematic_fragment");
+			inventory  = (InventoryFragment)  man.getFragment(savedInstanceState, "inventory_fragment");
+			calculator = (CalculatorFragment) man.getFragment(savedInstanceState, "calculator_fragment");
+			schematic.setFragments(inventory, calculator);
+			inventory.setFragments(schematic, calculator);
+			calculator.setFragments(schematic, inventory);
 		}
-		
 		pager.setAdapter(tab_adapter);
 		
 		this.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -72,6 +76,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		FragmentManager man = this.getSupportFragmentManager();
 		man.putFragment(state, "schematic_fragment", schematic);
 		man.putFragment(state, "inventory_fragment", inventory);
+		man.putFragment(state, "calculator_fragment", calculator);
 	}
 	
 	
@@ -126,6 +131,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				case 1:
 				ret = inventory;
 				break;
+				case 2:
+				ret = calculator;
+				break;
 			}
 					
 			return ret;
@@ -133,7 +141,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		 
 		@Override
 		public int getCount() {
-			return 2;
+			return 3;
 		}
 	}		
 	
