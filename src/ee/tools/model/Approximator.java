@@ -11,18 +11,21 @@ public class Approximator {
 	
 	public static double default_tolerance = 1;
 	public static int maximum_number_inverse_inverse_components = 5;
-	public static String recurse_tag = "Approximator";
+	public static String recurse_tag = "recuse tag";
+	public static String range_tag = "range tag";
 	
 	public static Components approximate(LinkedList<Component> comps, Component target)
 	{
 		Log.blackList.add(recurse_tag);
+		//Log.blackList.add(range_tag);
+		
 		Component[] seq = comps.toArray(new Component[0]);
 		Arrays.sort(seq);
 		double fractional_error = 0.01;
 		
 		Components ret = sum_recurse(seq, target.clone(), 0, 0, fractional_error, target.getValue());
-		
 		Log.blackList.removeLast();
+		//Log.blackList.removeLast();
 		return ret;
 	}
 	
@@ -34,13 +37,14 @@ public class Approximator {
 	}
 	
 	
-	@SuppressWarnings("unused")
 	private static Components sum_recurse(Component[] comps, Component target,
 			int depth, int parent_depth, double fractional_error, double original_target)
 	{
+		String indent = space(depth + parent_depth);
+		
 		if (50 < depth) 
 		{
-			Log.d(recurse_tag, space(depth + parent_depth) + "depth too large... returning***");
+			Log.d(recurse_tag, indent + "depth too large... returning***");
 			return null;
 		}
 		
@@ -54,9 +58,11 @@ public class Approximator {
 		
 		double range = original_target * fractional_error;
 		
+		Log.d(range_tag, indent + "sum range: " + range);
+		
 		if (Math.abs(target.getValue()) <= range)
 		{
-			Log.d(recurse_tag,  space(parent_depth + depth) + "RETURNING");
+			Log.d(recurse_tag,  indent + "RETURNING");
 			Components c = new Components(null, Components.SUM);
 			c.add(found);
 			return c;
@@ -73,8 +79,14 @@ public class Approximator {
 			//undo subtracting the found value 
 			target = target.add(found);
 			
-			double new_range = Math.abs(fractional_error * original_target - target.getValue());
-			
+			double new_range = fractional_error * original_target;
+			/*
+			Log.d(range_tag, indent + "Fractional error: " + fractional_error);
+			Log.d(range_tag, indent + "Original Target : " + original_target);
+			Log.d(range_tag, indent + "fractional * original : " + fractional_error * original_target);
+			Log.d(range_tag, indent + "target: " + target.getValue());
+			Log.d(range_tag, indent + "new_range: " + new_range);
+			*/
 			found = comps[index];
 
 			int new_parent_depth = depth + parent_depth;
@@ -100,15 +112,15 @@ public class Approximator {
 				
 				inv_inv_sum_res.add(found);
 			}
-			
+			/*
 			for (int i = index + 1; i < comps.length; i++)
 			{
 				found = comps[i];
 				
-				Log.d(recurse_tag, space(parent_depth + depth) + "STARTING INVERSE DIVE...");
-				Log.d(recurse_tag, space(parent_depth + depth) + "Using Index: " + i);
-				Log.d(recurse_tag, space(parent_depth + depth) + "       BASE: " + found.getValue());
-				Log.d(recurse_tag, space(parent_depth + depth) + "     TARGET: " + target.getValue());
+				Log.d(recurse_tag, indent + "STARTING INVERSE DIVE...");
+				Log.d(recurse_tag, indent + "Using Index: " + i);
+				Log.d(recurse_tag, indent + "       BASE: " + found.getValue());
+				Log.d(recurse_tag, indent + "     TARGET: " + target.getValue());
 
 				inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found, 1, new_parent_depth, new_range);
 			
@@ -116,20 +128,20 @@ public class Approximator {
 			
 				inv_inv_sum_res.add(found);
 				
-				Log.d(recurse_tag, space(parent_depth + depth) + "***FOUND:");
+				Log.d(recurse_tag, indent + "***FOUND:");
 				
 				Log.d(recurse_tag, inv_inv_sum_res.toString(parent_depth + depth));
 				
 				if (inv_inv_sum_res.getLength() < smallest_length)
 				{
-					Log.d(recurse_tag, space(parent_depth + depth) + "smallest so far...");
+					Log.d(recurse_tag, indent + "smallest so far...");
 					
 					smallest_length = inv_inv_sum_res.getLength();
 					
 					smallest = inv_inv_sum_res;
 				}
 			}
-			
+			*/
 			if (smallest == null) 
 			{
 				return null;
@@ -157,6 +169,8 @@ public class Approximator {
 		Component desired   = numerator.divide(denom);
 		
 		String indent = space(parent_depth + depth);
+		
+		Log.d(range_tag, indent + "inverse range: " + range);	
 		
 		boolean stop = false;
 		
