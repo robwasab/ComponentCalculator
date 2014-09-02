@@ -69,6 +69,8 @@ public class Component implements Comparable<Component>{
 		return space(indent) + this.toString();
 	}
 	
+	public int getLength() { return 1; }
+	
  	public int getQnty() {	return qnty;	}
 
  	public void setQnty(int qnty) {	this.qnty = qnty;	}

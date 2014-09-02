@@ -60,6 +60,8 @@ public interface ComponentViewInterface {
 	
 	public String getName();
 	
+	public double getValue();
+	
 	public void saveInstanceState(Bundle state);
 
 	public void restoreInstanceState(Bundle saved);

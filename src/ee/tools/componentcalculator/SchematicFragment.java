@@ -2,6 +2,7 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
+import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
 import ee.tools.model.Components;
@@ -44,7 +45,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 	
 	Schematic schematic;
 	
-	TextView fit, reset;
+	TextView fit, reset, value;
 	private CalculatorFragment calculator_fragment;
 	private InventoryFragment inventory_fragment ;
 	
@@ -75,10 +76,21 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 		
 		reset = (TextView) rootView.findViewById(R.id.reset_text_view);
 		
+		value = (TextView) rootView.findViewById(R.id.schematic_text_view_value);
+		
 		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		settings.setLayoutParams(params);
 				
-		schematic = new Schematic(current_context, settings);
+		schematic = new Schematic(current_context, settings) 
+		{
+			public void setSeries(ComponentViewInterface cvi)
+			{
+				super.setSeries(cvi);
+				
+				if (schematic.getCurrent() != null)
+					value.setText(ee.tools.model.EngNot.toEngNotation(schematic.getCurrent().getValue()));
+			}
+		};
 		
 		LinkedList<Integer> base_serial = new LinkedList<Integer>();
 		base_serial.add(0);

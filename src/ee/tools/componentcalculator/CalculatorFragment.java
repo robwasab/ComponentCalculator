@@ -199,5 +199,6 @@ OnClickListener{
 				Components.RESISTOR);
 		
 		schematic.setSeries(first_comp);
+		
 	}
 }

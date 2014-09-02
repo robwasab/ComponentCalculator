@@ -13,17 +13,24 @@ public class Approximator {
 	public static int maximum_number_inverse_inverse_components = 5;
 	public static String recurse_tag = "recuse tag";
 	public static String range_tag = "range tag";
+	public static String length_tag = "length tag";
+	public static String optimize_tag = "optimize";
 	
 	public static Components approximate(LinkedList<Component> comps, Component target)
 	{
 		Log.blackList.add(recurse_tag);
-		//Log.blackList.add(range_tag);
+		Log.blackList.add(range_tag);
+		Log.blackList.add(length_tag);
+		//Log.blackList.add(optimize_tag);
 		
 		Component[] seq = comps.toArray(new Component[0]);
 		Arrays.sort(seq);
 		double fractional_error = 0.01;
+		int max_length = -1; //unlimited
+		Components ret = sum_recurse(seq, target.clone(), 0, 0, fractional_error, target.getValue(), max_length, 0);
 		
-		Components ret = sum_recurse(seq, target.clone(), 0, 0, fractional_error, target.getValue());
+		Log.blackList.removeLast();
+		Log.blackList.removeLast();
 		Log.blackList.removeLast();
 		//Log.blackList.removeLast();
 		return ret;
@@ -38,9 +45,18 @@ public class Approximator {
 	
 	
 	private static Components sum_recurse(Component[] comps, Component target,
-			int depth, int parent_depth, double fractional_error, double original_target)
+			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length)
 	{
 		String indent = space(depth + parent_depth);
+		
+		Log.d(length_tag, indent + "Max Length: " + max_length);
+		Log.d(length_tag, indent + "Current Length: " + current_length);
+		
+		if (max_length < current_length && max_length != -1)
+		{
+			Log.d(length_tag, indent + "SUM RETURNING");
+			return null;
+		}
 		
 		if (50 < depth) 
 		{
@@ -50,126 +66,127 @@ public class Approximator {
 		
 		int index = BinarySearch.search(comps, target);
 		
-		Component found = comps[index];
+		Components optimized = null;
 		
-		Log.d(recurse_tag, found.toString(depth+parent_depth));
-		
-		target = target.subtract(found);
-		
-		double range = original_target * fractional_error;
-		
-		Log.d(range_tag, indent + "sum range: " + range);
-		
-		if (Math.abs(target.getValue()) <= range)
+		for (int i = index; i < comps.length; i++)
 		{
-			Log.d(recurse_tag,  indent + "RETURNING");
-			Components c = new Components(null, Components.SUM);
-			c.add(found);
-			return c;
-		}
+			Component found = comps[i];
+			
+			if ((target.getValue() * 5.0) < found.getValue()) break;
+			
+			Log.d(recurse_tag, found.toString(depth+parent_depth));
 		
-		if (target.lessThan(new Component(0.0))) 
-		{			
-			Components c = new Components(null, Components.SUM);
-			//here's where you should start the parallel approximation
-			//make sure you pass the "found" Component to the parallel approximator
-			//here, the found Component is guaranteed to overshoot the target value. 
-			
-			//since target is negative (target has to be negative to get in here)
-			//undo subtracting the found value 
-			target = target.add(found);
-			
-			double new_range = fractional_error * original_target;
-			/*
-			Log.d(range_tag, indent + "Fractional error: " + fractional_error);
-			Log.d(range_tag, indent + "Original Target : " + original_target);
-			Log.d(range_tag, indent + "fractional * original : " + fractional_error * original_target);
-			Log.d(range_tag, indent + "target: " + target.getValue());
-			Log.d(range_tag, indent + "new_range: " + new_range);
-			*/
-			found = comps[index];
-
-			int new_parent_depth = depth + parent_depth;
-			/*
-			Log.d(tag, space(parent_depth + depth) + "STARTING INVERSE DIVE...");
-			Log.d(tag, space(parent_depth + depth) + "Using Index: " + index);
-			Log.d(tag, space(parent_depth + depth) + "       BASE: " + found.getValue());
-			Log.d(tag, space(parent_depth + depth) + "     TARGET: " + target.getValue());
-			*/
-			Components inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found, 1, new_parent_depth, new_range);
-			/*	   
-			Log.d(tag, space(parent_depth + depth) + "***FOUND:");
-			Log.d(tag, inv_inv_sum_res.toString(parent_depth + depth));
-			*/
-			
-			Components smallest = inv_inv_sum_res;
-			
-			int smallest_length = 0;
-			
-			if (smallest != null)
+			Component new_target = target.subtract(found);
+		
+			double range = original_target * fractional_error;
+		
+			Log.d(range_tag, indent + "sum range: " + range);
+		
+			if (Math.abs(new_target.getValue()) <= range)
 			{
-				smallest_length = inv_inv_sum_res.getLength();
-				
-				inv_inv_sum_res.add(found);
+				Log.d(recurse_tag,  indent + "RETURNING");
+				Components c = new Components(null, Components.SUM);
+				c.add(found);
+				return c;
 			}
-			/*
-			for (int i = index + 1; i < comps.length; i++)
-			{
-				found = comps[i];
-				
-				Log.d(recurse_tag, indent + "STARTING INVERSE DIVE...");
-				Log.d(recurse_tag, indent + "Using Index: " + i);
-				Log.d(recurse_tag, indent + "       BASE: " + found.getValue());
-				Log.d(recurse_tag, indent + "     TARGET: " + target.getValue());
-
-				inv_inv_sum_res = inverse_inverse_sum_recurse(comps, target, found, 1, new_parent_depth, new_range);
+		
+			Components c = null;
 			
+			if (new_target.lessThan(new Component(0.0))) 
+			{			
+				c = new Components(null, Components.SUM);
+				//here's where you should start the parallel approximation
+				//make sure you pass the "found" Component to the parallel approximator
+				//here, the found Component is guaranteed to overshoot the target value. 
+			
+				//since target is negative (target has to be negative to get in here)
+				//undo subtracting the found value 
+				new_target = new_target.add(found);
+			
+				double new_range = fractional_error * original_target;
+				
+				int new_parent_depth = depth + parent_depth;
+				
+				Components inv_inv_sum_res = inverse_inverse_sum_recurse(comps, new_target, found, 1, 
+						new_parent_depth, new_range,
+							max_length, current_length + 1); //current_length + 1 to account for found component
+				
 				if (inv_inv_sum_res == null) continue;
-			
+				
 				inv_inv_sum_res.add(found);
-				
-				Log.d(recurse_tag, indent + "***FOUND:");
-				
-				Log.d(recurse_tag, inv_inv_sum_res.toString(parent_depth + depth));
-				
-				if (inv_inv_sum_res.getLength() < smallest_length)
+			
+				c.add(inv_inv_sum_res);
+			}
+			else
+			{
+				c = sum_recurse
+					(comps, new_target, depth + 1, parent_depth, fractional_error, original_target,
+							max_length, current_length + 1);
+		
+				if (c == null) continue;
+		
+				c.add(found);
+			}
+			
+			/*This is where the weeding happens*/
+			if (c.getLength() <= max_length || max_length == -1)
+			{
+				if (max_length == -1)
 				{
-					Log.d(recurse_tag, indent + "smallest so far...");
+					optimized  = c;
+					max_length = optimized.getLength();
 					
-					smallest_length = inv_inv_sum_res.getLength();
-					
-					smallest = inv_inv_sum_res;
+					Log.d(optimize_tag, indent + "INITIAL OPTIMIZE LENGTH: " + max_length);
+					Log.d(optimize_tag, c.toString(parent_depth + depth));
+				}
+				else
+				{
+					if (optimized != null)
+					{
+						double previous_precision = Math.abs(optimized.getValue() - target.getValue());
+						double new_precision = Math.abs(c.getValue() - target.getValue());
+						if (new_precision < previous_precision)
+						{
+							int new_length = c.getLength();
+							
+							Log.d(optimize_tag, indent + "Better Component...");
+							Log.d(optimize_tag, indent + "New Length: " + new_length);
+							Log.d(optimize_tag, indent + "previous value: " + optimized.getValue());
+							Log.d(optimize_tag, indent + "new value: " + c.getValue());
+							Log.d(optimize_tag, c.toString(parent_depth + depth));
+							
+							optimized  = c;
+							max_length = optimized.getLength();
+						}
+					}
 				}
 			}
-			*/
-			if (smallest == null) 
-			{
-				return null;
-			}
-			
-			c.add(smallest);
-			
-			return c;
 		}
 		
-		Components c = sum_recurse(comps, target, depth + 1, parent_depth, fractional_error, original_target);
-		
-		if (c == null) return null;
-		
-		c.add(found);
-		
-		return c;
+		return optimized;
 	}
 	
 	private static Components inverse_inverse_sum_recurse
-		(Component[] comps, Component target, Component base_comp, int depth, int parent_depth, double range)
+		(Component[] comps, Component target, Component base_comp,
+				int depth, int parent_depth, double range, int max_length, int current_length)
 	{
-		Component numerator = target.multiply(base_comp);
-		Component denom     = base_comp.subtract(target);
-		Component desired   = numerator.divide(denom);
-		
 		String indent = space(parent_depth + depth);
+
+		Log.d(length_tag, indent + "Max Length: " + max_length);
+		Log.d(length_tag, indent + "Current Length: " + current_length);
+
+		if (max_length < current_length && max_length != -1)
+		{
+			Log.d(length_tag, indent + "INV RETURNING");
+			return null;
+		}
 		
+		Component numerator = target.multiply(base_comp);
+		
+		Component denom     = base_comp.subtract(target);
+		
+		Component desired   = numerator.divide(denom);
+				
 		Log.d(range_tag, indent + "inverse range: " + range);	
 		
 		boolean stop = false;
@@ -197,6 +214,7 @@ public class Approximator {
 		{
 			//Then it is the smallest one youve got;
 			found = comps[0];
+			current_length += 1;
 		}
 		else 
 		{
@@ -241,15 +259,19 @@ public class Approximator {
 			
 			double fractional_error = new_range/desired_value;
 			Log.d(recurse_tag, space(parent_depth + depth)+"fractional_error: " + fractional_error);
-			found = sum_recurse(comps, desired, 1, parent_depth + depth, fractional_error, desired.getValue());
+			found = sum_recurse
+					(comps, desired, 1, parent_depth + depth, 
+							fractional_error, desired.getValue(),
+								max_length, current_length);
+			
+			if (found == null)
+			{
+				Log.d(recurse_tag, space(parent_depth + depth) + "SUM_RECURSE RETURNED NULL");
+				return null;
+			}
+			current_length += found.getLength();
 		}
-		
-		if (found == null)
-		{
-			Log.d(recurse_tag, space(parent_depth + depth) + "SUM_RECURSE RETURNED NULL");
-			return null;
-		}
-		
+				
 		Log.d(recurse_tag, found.toString(parent_depth + depth));
 				
 		//Calculate the resulting value
@@ -268,7 +290,10 @@ public class Approximator {
 			return ret;
 		}
 		
-		Components c = inverse_inverse_sum_recurse(comps, target, new_base_comp, depth + 1, parent_depth, range);
+		Components c = inverse_inverse_sum_recurse
+				(comps, target, new_base_comp, 
+						depth + 1, parent_depth, range,
+							max_length, current_length);
 		
 		if (c == null) return null;
 		

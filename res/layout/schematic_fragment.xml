@@ -36,6 +36,17 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:clickable="true"
             android:typeface="normal" />
+
+        <TextView
+            android:textAlignment="center"
+            android:id="@+id/schematic_text_view_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="" />
 	    	    
 	</TableRow>
 	

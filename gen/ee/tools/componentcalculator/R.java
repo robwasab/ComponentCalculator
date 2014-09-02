@@ -32,7 +32,7 @@ public final class R {
         public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a001b;
+        public static final int action_settings=0x7f0a001c;
         public static final int calculator_button_find_combinations=0x7f0a000c;
         public static final int calculator_check_box_qnty=0x7f0a0006;
         public static final int calculator_edit_text_find_value=0x7f0a0003;
@@ -53,8 +53,9 @@ public final class R {
         public static final int number_incrementor_holder=0x7f0a0012;
         public static final int pager=0x7f0a0001;
         public static final int reset_text_view=0x7f0a0019;
-        public static final int schematic_layout=0x7f0a001a;
+        public static final int schematic_layout=0x7f0a001b;
         public static final int schematic_table_row=0x7f0a0017;
+        public static final int schematic_text_view_value=0x7f0a001a;
         public static final int tableRow1=0x7f0a0004;
         public static final int tableRow2=0x7f0a000b;
         public static final int tableRow3=0x7f0a0007;
