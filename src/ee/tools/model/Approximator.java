@@ -21,7 +21,7 @@ public class Approximator {
 		Log.blackList.add(recurse_tag);
 		Log.blackList.add(range_tag);
 		Log.blackList.add(length_tag);
-		//Log.blackList.add(optimize_tag);
+		Log.blackList.add(optimize_tag);
 		
 		Component[] seq = comps.toArray(new Component[0]);
 		Arrays.sort(seq);
@@ -32,7 +32,7 @@ public class Approximator {
 		Log.blackList.removeLast();
 		Log.blackList.removeLast();
 		Log.blackList.removeLast();
-		//Log.blackList.removeLast();
+		Log.blackList.removeLast();
 		return ret;
 	}
 	
@@ -58,7 +58,7 @@ public class Approximator {
 			return null;
 		}
 		
-		if (50 < depth) 
+		if (20 < depth) 
 		{
 			Log.d(recurse_tag, indent + "depth too large... returning***");
 			return null;
@@ -68,7 +68,7 @@ public class Approximator {
 		
 		Components optimized = null;
 		
-		for (int i = index; i < comps.length; i++)
+		for (int i = (index - 1 < 0) ? 0 : index - 1; i < comps.length; i++)
 		{
 			Component found = comps[i];
 			
@@ -123,7 +123,11 @@ public class Approximator {
 					(comps, new_target, depth + 1, parent_depth, fractional_error, original_target,
 							max_length, current_length + 1);
 		
-				if (c == null) continue;
+				if (c == null) 
+				{
+					if (max_length == -1) return null;
+					continue;
+				}
 		
 				c.add(found);
 			}

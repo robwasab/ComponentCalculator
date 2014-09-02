@@ -5,23 +5,17 @@ import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.model.Component;
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.text.TextUtils.TruncateAt;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-public class InventoryListItemView extends RelativeLayout implements Checkable, OnCheckedChangeListener{
+public class InventoryListItemView extends RelativeLayout implements OnCheckedChangeListener{
 
-		private TextView text_view;
 		private LinearLayout layout;
 		
 		private CheckBox check_box;
@@ -35,7 +29,6 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 		Schematic schematic;
 		boolean checked = false;
 		private String tag = "InventoryListItemView";
-		private int qnty;
 		
 		public InventoryListItemView(Context context, ComponentViewInterface component_view) 
 		{
@@ -58,11 +51,7 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 			boolean attach_to_root = true;
 			
 			inflater.inflate(R.layout.inventory_list_item, root, attach_to_root);
-			
-			text_view = (TextView) this.findViewById(R.id.text_view);	
-			
-			text_view.setText(component_view.toString()); 
-			
+						
 			check_box = (CheckBox) this.findViewById(R.id.inventory_check_box);
 			
 			check_box.setOnCheckedChangeListener(this);
@@ -72,7 +61,14 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 			LinearLayout number_incrementor_holder
 				= (LinearLayout) this.findViewById(R.id.number_incrementor_holder);
 			
-			incrementor = new NumberIncrementorView(context);
+			incrementor = new NumberIncrementorView(context)
+			{
+				public void onChange(int val)
+				{
+					if (val == 0) check_box.setChecked(false);
+					else check_box.setChecked(true);
+				}
+			};
 			
 			incrementor.setLayoutParams(params);
 			
@@ -116,14 +112,30 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 		{
 			this.component_view = cvi;
 			this.schematic.setSeries(cvi);
-			this.text_view.setText(cvi.toString()); 
 			
 			if (this.component_view instanceof Component)
 			{
 				Component comp = (Component)this.component_view;
 				this.incrementor.setComponent(comp);
 			}		
-	
+			
+			int set_width = (int)component_view.getWidth();
+			int set_height = (int)component_view.getHeight();
+			
+			int schematic_width = schematic.getWidth();
+			int schematic_height = schematic.getHeight();
+			
+			int width_margin = Math.abs(schematic_width-set_width);
+			int height_margin = Math.abs(schematic_height-set_height);
+			
+			if (5 < width_margin || 5 < height_margin)
+			{
+				android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams
+						(set_width, set_height);
+				
+				schematic.setLayoutParams(params);
+			}
+			
 			invalidate();
 		}
 		
@@ -132,40 +144,7 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 		{
 			super.invalidate();
 			this.schematic.invalidate();
-			this.text_view.invalidate();
 			if (this.adapter != null) this.adapter.notifyDataSetChanged();
-		}
-		
-		private void expandView() {
-			text_view.setEllipsize(null);
-			text_view.setMaxLines(Integer.MAX_VALUE);
-			schematic.setVisibility(View.GONE);
-			invalidate();
-		}
-
-		private void collapseView() {
-			text_view.setLines(2);
-			text_view.setEllipsize(TruncateAt.END);
-			schematic.setVisibility(View.VISIBLE);
-			invalidate();
-		}
-
-		@Override
-		public void setChecked(boolean checked) {
-			this.checked = checked;
-			if (checked) expandView();
-			else         collapseView();
-		}
-
-		@Override
-		public boolean isChecked() {
-			return checked;
-		}
-
-		@Override
-		public void toggle() {
-			this.checked ^= true;
-			setChecked(this.checked);
 		}
 		
 		public String toString()
@@ -176,7 +155,7 @@ public class InventoryListItemView extends RelativeLayout implements Checkable, 
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
-			// TODO Auto-generated method stub
-			
+			if (this.incrementor.getValue() == 0) buttonView.setChecked(false);
+			else if (this.incrementor.getValue() == -1) buttonView.setChecked(true);
 		}
 }

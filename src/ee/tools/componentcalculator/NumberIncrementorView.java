@@ -40,6 +40,11 @@ public class NumberIncrementorView extends LinearLayout{
 		init();
 	}
 	
+	public void onChange(int count)
+	{
+		
+	}
+	
 	public void init()
 	{
 		LayoutInflater inflater = (LayoutInflater)context.getSystemService(
@@ -61,15 +66,17 @@ public class NumberIncrementorView extends LinearLayout{
 			@Override
 			public void onClick(View v) 
 			{
-				if (val <= 0) return;
+				if (val <= -1) return;
 				
 				val--;
 				number.setText(Integer.toString(val));
 				if (component != null) component.setQnty(val);
-				if (val <= 0)
+				if (val <= -1)
 				{
 					decrement.setVisibility(INVISIBLE);
+					number.setText("°");
 				}
+				onChange(val);
 				//if (player != null) player.start();
 			}
 		});
@@ -80,10 +87,11 @@ public class NumberIncrementorView extends LinearLayout{
 				val++;
 				number.setText(Integer.toString(val));
 				if (component != null) component.setQnty(val);
-				if (0 < val) 
+				if (-1 < val) 
 				{
 					decrement.setVisibility(VISIBLE);
 				}
+				onChange(val);
 				//if (player != null) player.start();
 			}
 		});
@@ -98,19 +106,24 @@ public class NumberIncrementorView extends LinearLayout{
 	{
 		this.component = c;
 		this.setValue(c.getQnty());
+		onChange(c.getQnty());
 	}
 	
 	public int getValue() { return val; }
 	
 	public void setValue(int val)
 	{
-		if (val < 0)
+		if (val < -1)
 			return;
 		
-		this.val = val; 
-		number.setText(Integer.toString(val));
+		this.val = val;
+		if (this.val == -1)
+			number.setText("°");
 		
-		if (val <= 0)
+		else
+			number.setText(Integer.toString(val));
+		
+		if (val <= -1)
 		{
 			decrement.setVisibility(INVISIBLE);
 		}

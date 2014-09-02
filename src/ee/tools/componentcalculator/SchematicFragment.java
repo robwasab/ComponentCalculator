@@ -90,6 +90,13 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 				if (schematic.getCurrent() != null)
 					value.setText(ee.tools.model.EngNot.toEngNotation(schematic.getCurrent().getValue()));
 			}
+			
+			public void invalidate()
+			{
+				super.invalidate();
+				if (schematic != null && schematic.getCurrent() != null)
+					value.setText(ee.tools.model.EngNot.toEngNotation(schematic.getCurrent().getValue()));				
+			}
 		};
 		
 		LinkedList<Integer> base_serial = new LinkedList<Integer>();

@@ -175,7 +175,9 @@ OnClickListener{
 		
 		if (!read_text_view()) return;
 		
-		LinkedList<Component> inventory = inventory_fragment.getComponents();
+		this.close_key_board(this.find_value);
+		
+		LinkedList<Component> inventory = inventory_fragment.getComponents(component_type);
 		
 		Components combo = Approximator.approximate(inventory, new Component(this.double_value));
 		
@@ -196,7 +198,7 @@ OnClickListener{
 				base_serial,
 				combo.components,
 				combo.operation,
-				Components.RESISTOR);
+				component_type);
 		
 		schematic.setSeries(first_comp);
 		

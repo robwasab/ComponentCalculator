@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
     android:id="@+id/inventory_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" xmlns:android1="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical" 
+    android:background="@color/white"
+    >
 
+    <TableRow
+      android:id="@+id/tableRow3"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content" >
+            
+          	<RadioGroup
+          	    android:id="@+id/inventory_radio_group"
+          	    android:orientation="horizontal"
+   				android:layout_width="fill_parent"
+   				android:layout_height="wrap_content"
+   				android:layout_weight="1"
+          	    >
+          	    
+          	<RadioButton
+                android:id="@+id/inventory_radio_button_resistor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/calculator_string_resistor" />
+
+            <RadioButton
+                android:id="@+id/inventory_radio_button_capacitor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/calculator_string_capacitor" />
+            
+			</RadioGroup>
+    </TableRow>
     
     <ListView
         android:id="@+id/inventory_list_view"
