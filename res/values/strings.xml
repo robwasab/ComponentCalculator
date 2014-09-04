@@ -14,5 +14,7 @@
     </string>
     <string name="calculator_string_resistor">Resistor</string>
        <string name="calculator_string_capacitor">Capacitor</string>
-    
+    <string name="calculator_string_prefer_shorter">Prefer Shorter</string>
+    <string name="calculator_string_prefer_accuracy">Prefer Accuracy</string>
+    <string name="calculator_string_precision">10% Error:</string>
 </resources>

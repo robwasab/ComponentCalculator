@@ -9,6 +9,14 @@ public class Approximator {
 
 	public static double precision = 0.1; //0.01, 0.001, 0.0001, 0.00001...
 	
+	public static String last_message = "";
+	public static int error = -1;
+	
+	public static final int EXCEEDED_INVERSE_INVERSE_SUM_DEPTH = 0;
+	public static final int EXCEEDED_SUM_DEPTH = 1;
+	public static final int EXCEEDED_MAX_LENGTH = 2;
+	public static final int INVERSE_INVERSE_SUM_ERROR = 3;
+	
 	public static double default_tolerance = 1;
 	public static int maximum_number_inverse_inverse_components = 5;
 	public static String recurse_tag = "recuse tag";
@@ -18,6 +26,8 @@ public class Approximator {
 	
 	public static Components approximate(LinkedList<Component> comps, Component target)
 	{
+		last_message = "";
+		error = 0;
 		Log.blackList.add(recurse_tag);
 		Log.blackList.add(range_tag);
 		Log.blackList.add(length_tag);
@@ -31,7 +41,7 @@ public class Approximator {
 		
 		Log.blackList.removeLast();
 		Log.blackList.removeLast();
-		Log.blackList.removeLast();
+		Log.blackList.removeLast();	
 		Log.blackList.removeLast();
 		return ret;
 	}
@@ -48,6 +58,7 @@ public class Approximator {
 			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length)
 	{
 		String indent = space(depth + parent_depth);
+		Log.d(recurse_tag, indent + "SUM");
 		
 		Log.d(length_tag, indent + "Max Length: " + max_length);
 		Log.d(length_tag, indent + "Current Length: " + current_length);
@@ -55,12 +66,20 @@ public class Approximator {
 		if (max_length < current_length && max_length != -1)
 		{
 			Log.d(length_tag, indent + "SUM RETURNING");
+			last_message = "Sum exceeded max length\n";
+			last_message += "Max Length: " + max_length + "\n";
+			error = EXCEEDED_MAX_LENGTH;
 			return null;
 		}
 		
 		if (20 < depth) 
 		{
 			Log.d(recurse_tag, indent + "depth too large... returning***");
+			error = Approximator.EXCEEDED_SUM_DEPTH;
+			last_message = "Sum Recurse Exceeded Depth: " + depth + "\n";
+			last_message += "Parent Depth: " + parent_depth + "\n";
+			last_message += "Original Target: " + original_target + "\n";
+			last_message += "Current Search Value: " + target;
 			return null;
 		}
 		
@@ -68,11 +87,15 @@ public class Approximator {
 		
 		Components optimized = null;
 		
+		int fails = 0;
+		
 		for (int i = (index - 1 < 0) ? 0 : index - 1; i < comps.length; i++)
 		{
 			Component found = comps[i];
 			
-			if ((target.getValue() * 5.0) < found.getValue()) break;
+			if (1 < fails) break;
+			
+			//if ((target.getValue() * 5.0) < found.getValue()) break;
 			
 			Log.d(recurse_tag, found.toString(depth+parent_depth));
 		
@@ -91,6 +114,8 @@ public class Approximator {
 			}
 		
 			Components c = null;
+			
+			Log.d(recurse_tag, indent + "New Target: " + new_target);
 			
 			if (new_target.lessThan(new Component(0.0))) 
 			{			
@@ -111,7 +136,11 @@ public class Approximator {
 						new_parent_depth, new_range,
 							max_length, current_length + 1); //current_length + 1 to account for found component
 				
-				if (inv_inv_sum_res == null) continue;
+				if (inv_inv_sum_res == null)
+				{
+					if (max_length != -1) fails++;
+					continue;
+				}
 				
 				inv_inv_sum_res.add(found);
 			
@@ -126,6 +155,7 @@ public class Approximator {
 				if (c == null) 
 				{
 					if (max_length == -1) return null;
+					fails++;
 					continue;
 				}
 		
@@ -147,9 +177,14 @@ public class Approximator {
 				{
 					if (optimized != null)
 					{
+						boolean swap = false;
 						double previous_precision = Math.abs(optimized.getValue() - target.getValue());
 						double new_precision = Math.abs(c.getValue() - target.getValue());
-						if (new_precision < previous_precision)
+						swap |= new_precision < previous_precision;
+						
+						swap |= c.getLength() < optimized.getLength();
+						
+						if (swap)
 						{
 							int new_length = c.getLength();
 							
@@ -175,14 +210,21 @@ public class Approximator {
 				int depth, int parent_depth, double range, int max_length, int current_length)
 	{
 		String indent = space(parent_depth + depth);
-
+		Log.d(recurse_tag, indent + "INVERSE");
+		
 		Log.d(length_tag, indent + "Max Length: " + max_length);
 		Log.d(length_tag, indent + "Current Length: " + current_length);
 
-		if (max_length < current_length && max_length != -1)
+		if (max_length != -1)
 		{
-			Log.d(length_tag, indent + "INV RETURNING");
-			return null;
+			if (max_length < current_length)
+			{
+				Log.d(length_tag, indent + "INV RETURNING");
+				last_message = "Inverse inverse sum exceeded max_length";
+				last_message += "Max Length: " + max_length + "\n";
+				error = EXCEEDED_MAX_LENGTH;
+				return null;
+			}
 		}
 		
 		Component numerator = target.multiply(base_comp);
@@ -263,6 +305,7 @@ public class Approximator {
 			
 			double fractional_error = new_range/desired_value;
 			Log.d(recurse_tag, space(parent_depth + depth)+"fractional_error: " + fractional_error);
+			
 			found = sum_recurse
 					(comps, desired, 1, parent_depth + depth, 
 							fractional_error, desired.getValue(),
@@ -271,6 +314,18 @@ public class Approximator {
 			if (found == null)
 			{
 				Log.d(recurse_tag, space(parent_depth + depth) + "SUM_RECURSE RETURNED NULL");
+				if (error == Approximator.EXCEEDED_SUM_DEPTH)
+				{
+					error = Approximator.INVERSE_INVERSE_SUM_ERROR;
+					last_message += "Call to Sum Within Inverse Inverse Sum exceeded depth...\n";
+					last_message += "Desired: " + desired + "\n";
+				}
+				else if (error == Approximator.EXCEEDED_MAX_LENGTH)
+				{
+					last_message += "Call to Sum Within Inverse Inverse Sum exceeded max length\n";
+					last_message += "Max Length: " + max_length + "\n";
+					last_message += "Desired: " + desired.getValue() + "\n";
+				}
 				return null;
 			}
 			current_length += found.getLength();
@@ -304,13 +359,6 @@ public class Approximator {
 		c.add(found);
 		
 		return c;
-	}
-	
-	private static double percent_error(Component target, Component compare)
-	{
-		double tar = target.getValue();
-		double com = compare.getValue();
-		return (com - tar)/tar * 100.0;
 	}
 	
 	public static void main(String[] args) throws CsvParserException

@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 public class CalculatorFragment extends Fragment implements OnKeyListener,
 CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener,
@@ -51,6 +52,8 @@ OnClickListener{
 	private InventoryFragment inventory_fragment;
 	
 	private SchematicFragment schematic_fragment;
+		
+	TextView message;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
@@ -74,6 +77,8 @@ OnClickListener{
 		checkbox.setChecked(this.use_qnty);
 		
 		find_combinations = (Button) rootView.findViewById(R.id.calculator_button_find_combinations);
+		
+		message = (TextView) rootView.findViewById(R.id.calculator_text_view_console);
 		
 		init_listeners();
 		
@@ -177,12 +182,15 @@ OnClickListener{
 		
 		this.close_key_board(this.find_value);
 		
+		message.setText("");
+		
 		LinkedList<Component> inventory = inventory_fragment.getComponents(component_type);
 		
 		Components combo = Approximator.approximate(inventory, new Component(this.double_value));
 		
 		if (combo == null)
 		{
+			message.setText(Approximator.last_message);
 			Log.d(tag, "Approximator returned null, combination not possible...");
 			return;
 		}
@@ -202,5 +210,5 @@ OnClickListener{
 		
 		schematic.setSeries(first_comp);
 		
-	}
+	}	
 }
