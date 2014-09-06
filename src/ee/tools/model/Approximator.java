@@ -17,15 +17,18 @@ public class Approximator {
 	public static final int EXCEEDED_MAX_LENGTH = 2;
 	public static final int INVERSE_INVERSE_SUM_ERROR = 3;
 	
-	public static double default_tolerance = 1;
-	public static int maximum_number_inverse_inverse_components = 5;
+	public static final int PREFER_SHORTER = 0, PREFER_ACCURACY = 1;
+	public static int preference = PREFER_SHORTER;
+	
 	public static String recurse_tag = "recuse tag";
 	public static String range_tag = "range tag";
 	public static String length_tag = "length tag";
 	public static String optimize_tag = "optimize";
-	public static Component static_component = new Component(0);
+	public static String fail_tag = "fail tag";
 	
-	public static Components approximate(LinkedList<Component> comps, Component target)
+	private static Component static_component = new Component(0);
+	
+	public static Components approximate(LinkedList<Component> comps, Component target, double percent_error) throws KillThreadException
 	{
 		last_message = "";
 		error = 0;
@@ -36,7 +39,7 @@ public class Approximator {
 		
 		Component[] seq = comps.toArray(new Component[0]);
 		Arrays.sort(seq);
-		double fractional_error = 0.01;
+		double fractional_error = percent_error/100.0;
 		int max_length = -1; //unlimited
 		Components ret = sum_recurse(seq, target.getValue(), 0, 0, fractional_error, target.getValue(), max_length, 0);
 		
@@ -45,19 +48,12 @@ public class Approximator {
 		Log.blackList.removeLast();	
 		Log.blackList.removeLast();
 		return ret;
-	}
-	
-	private static String space(int spaces)
-	{
-		String space = "";
-		for (int i = 0; i < spaces; i++) space += " ";
-		return space;
-	}
-	
+	}	
 	
 	private static Components sum_recurse(Component[] comps, double target,
-			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length)
-	{
+			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length) throws KillThreadException
+	{		
+		if (Thread.interrupted()) throw new KillThreadException();
 		//String indent = space(depth + parent_depth);
 	/*
 		Log.d(recurse_tag, indent + "SUM");	
@@ -70,18 +66,20 @@ public class Approximator {
 		/*	Log.d(length_tag, indent + "SUM RETURNING");
 			last_message = "Sum exceeded max length\n";
 			last_message += "Max Length: " + max_length + "\n";
+		*/
 			error = EXCEEDED_MAX_LENGTH;
 			return null;
 		}
 		
 		if (20 < depth) 
 		{
-		/*	Log.d(recurse_tag, indent + "depth too large... returning***"); */
+		 	/* Log.d(recurse_tag, indent + "depth too large... returning***"); */
 			error = Approximator.EXCEEDED_SUM_DEPTH;
 			last_message = "Sum Recurse Exceeded Depth: " + depth + "\n";
 			last_message += "Parent Depth: " + parent_depth + "\n";
 			last_message += "Original Target: " + original_target + "\n";
 			last_message += "Current Search Value: " + target;
+			last_message += "Recommend Increasing % Error\n";
 			return null;
 		}
 		
@@ -97,7 +95,11 @@ public class Approximator {
 		{
 			Component found = comps[i];
 			
-			if (1 < fails) break;
+			if (1 < fails) 
+			{
+				Log.d(fail_tag, "fails exceeded..");
+				break;
+			}
 			
 			//if ((target.getValue() * 5.0) < found.getValue()) break;
 			
@@ -167,7 +169,18 @@ public class Approximator {
 			}
 			
 			/*This is where the weeding happens*/
-			if (c.getLength() <= max_length || max_length == -1)
+			boolean evaluate = false;
+			
+			if (Approximator.preference == PREFER_SHORTER)
+				evaluate = (c.getLength() <  max_length || max_length == -1);
+			
+			else if (Approximator.preference == PREFER_ACCURACY)
+				evaluate = (c.getLength() <= max_length || max_length == -1);
+			
+			else 
+				evaluate = (c.getLength() <= max_length || max_length == -1);
+			
+			if (evaluate)
 			{
 				if (max_length == -1)
 				{
@@ -212,8 +225,10 @@ public class Approximator {
 	
 	private static Components inverse_inverse_sum_recurse
 		(Component[] comps, double target, double base_comp,
-				int depth, int parent_depth, double range, int max_length, int current_length)
+				int depth, int parent_depth, double range, int max_length, int current_length) throws KillThreadException
 	{
+		if (Thread.interrupted()) return null;
+
 		//String indent = space(parent_depth + depth);
 	/*
 		Log.d(recurse_tag, indent + "INVERSE");
@@ -331,9 +346,9 @@ public class Approximator {
 				}
 				else if (error == Approximator.EXCEEDED_MAX_LENGTH)
 				{
-					last_message += "Call to Sum Within Inverse Inverse Sum exceeded max length\n";
-					last_message += "Max Length: " + max_length + "\n";
-					last_message += "Desired: " + desired + "\n";
+					//last_message += "Call to Sum Within Inverse Inverse Sum exceeded max length\n";
+					//last_message += "Max Length: " + max_length + "\n";
+					//last_message += "Desired: " + desired + "\n";
 				}
 				return null;
 			}
@@ -370,11 +385,11 @@ public class Approximator {
 		return c;
 	}
 	
-	public static void main(String[] args) throws CsvParserException
+	public static void main(String[] args) throws CsvParserException, KillThreadException
 	{
 		LinkedList<Component> ll;
 		ll = CsvParser.parseFile("/Users/robwasab/Documents/android/PermutationCalculator/src/parts2.csv");
-		Components res = approximate(ll, new Component(9650));
+		Components res = approximate(ll, new Component(9650), 10.0);
 		System.out.println(res);
 	}
 }

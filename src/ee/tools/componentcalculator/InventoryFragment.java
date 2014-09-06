@@ -9,16 +9,24 @@ import ee.tools.model.Component;
 import ee.tools.model.Components;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 
 public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedChangeListener {
+	
+	String tag = "Inventory Fragment";
 	
 	InventoryListAdapter component_adapter;
 	
@@ -86,8 +94,46 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 											resistor_views, capacitor_views);
 		
 		list_view.setAdapter(adapter);
-			
+		
+		this.setHasOptionsMenu(true);
+		
 		return rootView;
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
+		inflater.inflate(R.menu.inventory_menu, menu);
+		super.onCreateOptionsMenu(menu, inflater);		
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+		case R.id.inventory_menu_trash:
+			Log.d(tag, "Trash pressed");
+			openTrashDialog();
+			return true;
+		case R.id.inventory_menu_add:
+			Log.d(tag, "Add pressed");
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	private void openTrashDialog()
+	{
+		final Dialog dialog = new Dialog(current_context);
+		dialog.setContentView(R.layout.inventory_trash_dialog);
+		dialog.setTitle("Delete...");
+		Button close = (Button) dialog.findViewById(R.id.inventory_trash_dialog_button_close);
+		close.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {	dialog.dismiss();	}
+		});
+		dialog.show();
 	}
 	
 	public LinkedList<Component> getComponents(int type)
@@ -103,7 +149,6 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 		{
 			if (source.get(i) instanceof Component)
 			{
-				//ret.add((Component)views.get(i));
 				ret.add(new Component(((Component)source.get(i)).getValue()));
 			}
 		}

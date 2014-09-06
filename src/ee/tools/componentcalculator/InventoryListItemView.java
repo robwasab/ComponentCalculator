@@ -3,20 +3,29 @@ package ee.tools.componentcalculator;
 
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.model.Component;
+import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-public class InventoryListItemView extends RelativeLayout implements OnCheckedChangeListener{
+public class InventoryListItemView extends RelativeLayout 
+implements OnCheckedChangeListener, OnLongClickListener{
 
-		private LinearLayout layout;
+	 	private LinearLayout layout;
+	 	
+		private LinearLayout schematic_layout;
 		
 		private CheckBox check_box;
 		
@@ -51,12 +60,16 @@ public class InventoryListItemView extends RelativeLayout implements OnCheckedCh
 			boolean attach_to_root = true;
 			
 			inflater.inflate(R.layout.inventory_list_item, root, attach_to_root);
-						
+			
+			layout = (LinearLayout)this.findViewById(R.id.inventory_list_item_layout);
+			
+			layout.setOnLongClickListener(this);
+			
 			check_box = (CheckBox) this.findViewById(R.id.inventory_check_box);
 			
 			check_box.setOnCheckedChangeListener(this);
 			
-			layout  = (LinearLayout) this.findViewById(R.id.inventory_schematic_holder);
+			schematic_layout  = (LinearLayout) this.findViewById(R.id.inventory_schematic_holder);
 			
 			LinearLayout number_incrementor_holder
 				= (LinearLayout) this.findViewById(R.id.number_incrementor_holder);
@@ -81,7 +94,7 @@ public class InventoryListItemView extends RelativeLayout implements OnCheckedCh
 				incrementor.setComponent(c);
 			}		
 			
-			schematic = new Schematic(context, layout);
+			schematic = new Schematic(context, schematic_layout);
 			
 			schematic.setSeries(component_view);
 			
@@ -90,11 +103,16 @@ public class InventoryListItemView extends RelativeLayout implements OnCheckedCh
 			int set_width = (int)component_view.getWidth();
 			int set_height = (int)component_view.getHeight();
 			
-			schematic.setLayoutParams(new android.view.ViewGroup.LayoutParams(set_width, set_height));
+			android.widget.LinearLayout.LayoutParams s_params = new android.widget.LinearLayout.LayoutParams
+					(set_width, set_height);
+		
+			s_params.gravity = android.view.Gravity.LEFT;
+			
+			schematic.setLayoutParams(s_params);
 			
 			schematic.setEnabled(false);
 		
-			layout.addView(schematic);
+			schematic_layout.addView(schematic);
 			
 		}
 		
@@ -132,6 +150,8 @@ public class InventoryListItemView extends RelativeLayout implements OnCheckedCh
 			{
 				android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams
 						(set_width, set_height);
+			
+				params.gravity = android.view.Gravity.LEFT;
 				
 				schematic.setLayoutParams(params);
 			}
@@ -157,5 +177,49 @@ public class InventoryListItemView extends RelativeLayout implements OnCheckedCh
 				boolean isChecked) {
 			if (this.incrementor.getValue() == 0) buttonView.setChecked(false);
 			else if (this.incrementor.getValue() == -1) buttonView.setChecked(true);
+		}
+
+		@Override
+		public boolean onLongClick(View v) {
+			Log.d(tag, this.component_view.toString());
+			android.os.Vibrator vibrator = (Vibrator) this.getContext().getSystemService(this.getContext().VIBRATOR_SERVICE);
+			vibrator.vibrate(50);
+			schematic_layout.removeAllViews();
+			InventoryDialog dialog = new InventoryDialog(this.getContext(),schematic){
+				public void dismiss()
+				{
+					super.dismiss();
+					schematic_layout.addView(schematic);
+				}
+			};
+			dialog.show();
+			return true;
+		}
+		
+		class InventoryDialog extends Dialog
+		{
+			LinearLayout schematic_holder;
+			Schematic schematic;
+			Button delete;
+			EditText edit_text;
+			public InventoryDialog(Context context, Schematic schematic) {
+				super(context);
+				this.schematic = schematic;
+				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.CENTER_HORIZONTAL;
+				this.setContentView(R.layout.inventory_list_item_dialog);
+				this.setTitle("Settings");
+				delete = (Button) this.findViewById(R.id.inventory_list_item_dialog_button_delete);
+				schematic_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_holder);
+				schematic_holder.addView(schematic);
+				edit_text = (EditText) this.findViewById(R.id.inventory_list_item_dialog_edit_text);
+			}
+			
+			public void dismiss()
+			{
+				super.dismiss();
+				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.LEFT;
+				schematic_holder.removeAllViews();
+			}
+			
 		}
 }

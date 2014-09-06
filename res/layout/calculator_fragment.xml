@@ -148,10 +148,17 @@
     </TableLayout>
 
     <ProgressBar
-        android:id="@+id/progressBar1"
+        android:id="@+id/calculator_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/calculator_button_kill"
+        android:background="@color/red"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/calculator_string_kill" />
 
     <TextView
         android:id="@+id/calculator_text_view_console"

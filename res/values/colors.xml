@@ -3,4 +3,5 @@
        <color name="dark">#3D3D3D</color>
     <color name="light">#1F1F1F</color>
  	<color name="white">#FFFFFF</color>
+ 	<color name="red">#E00000</color>
 </resources>

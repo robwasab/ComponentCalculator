@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/inventory_menu_trash"
+        android:icon="@drawable/ic_trash_light"
+        android:title="@string/inventory_menu_string_trash"
+        android:showAsAction="ifRoom"
+        />
+    <item android:id="@+id/inventory_menu_add"
+        android:icon="@drawable/ic_add"
+        android:title="@string/inventory_menu_string_add"
+        android:showAsAction="ifRoom"
+        />
+    
+</menu>
