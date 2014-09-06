@@ -25,13 +25,14 @@ public class Approximator {
 	public static String length_tag = "length tag";
 	public static String optimize_tag = "optimize";
 	public static String fail_tag = "fail tag";
-	
+	public static boolean kill = false;
 	private static Component static_component = new Component(0);
 	
-	public static Components approximate(LinkedList<Component> comps, Component target, double percent_error) throws KillThreadException
+	public static Components approximate(LinkedList<Component> comps, Component target, double percent_error)  
 	{
 		last_message = "";
 		error = 0;
+		kill = false;
 		Log.blackList.add(recurse_tag);
 		Log.blackList.add(range_tag);
 		Log.blackList.add(length_tag);
@@ -51,9 +52,13 @@ public class Approximator {
 	}	
 	
 	private static Components sum_recurse(Component[] comps, double target,
-			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length) throws KillThreadException
+			int depth, int parent_depth, double fractional_error, double original_target, int max_length, int current_length)  
 	{		
-		if (Thread.interrupted()) throw new KillThreadException();
+		if (Thread.interrupted()) 
+		{
+			last_message = "Killed...";
+			kill = true;
+		}
 		//String indent = space(depth + parent_depth);
 	/*
 		Log.d(recurse_tag, indent + "SUM");	
@@ -91,7 +96,7 @@ public class Approximator {
 		
 		int fails = 0;
 		
-		for (int i = (index - 1 < 0) ? 0 : index - 1; i < comps.length; i++)
+		for (int i = (index - 1 < 0) ? 0 : index - 1; i < comps.length && kill != true; i++)
 		{
 			Component found = comps[i];
 			
@@ -204,7 +209,6 @@ public class Approximator {
 						
 						if (swap)
 						{
-							int new_length = c.getLength();
 						/*
 							Log.d(optimize_tag, indent + "Better Component...");
 							Log.d(optimize_tag, indent + "New Length: " + new_length);
@@ -225,9 +229,9 @@ public class Approximator {
 	
 	private static Components inverse_inverse_sum_recurse
 		(Component[] comps, double target, double base_comp,
-				int depth, int parent_depth, double range, int max_length, int current_length) throws KillThreadException
+				int depth, int parent_depth, double range, int max_length, int current_length)
 	{
-		if (Thread.interrupted()) return null;
+		if (kill) return null;
 
 		//String indent = space(parent_depth + depth);
 	/*

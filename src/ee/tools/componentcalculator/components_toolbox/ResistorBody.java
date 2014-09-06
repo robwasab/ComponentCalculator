@@ -103,15 +103,11 @@ public class ResistorBody implements Body
 		recalculate();
 	}
 	
-	public void setValue(double value)
+	public void setValue(double value) throws ResistorException
 	{
-		try
-		{
 			resistor_bands.setValue(value);
 			this.value = value;			
 			main_init();
-		}
-		catch (ResistorException re) {}
 	}
 	
 	public void setValue(double value, int tolerance) throws ResistorException
@@ -320,7 +316,8 @@ public class ResistorBody implements Body
 		this.y = saved.getFloat(prefix + "y");
 		double value = saved.getDouble(prefix + "value");
 		
-		this.setValue(value);
+		try { this.setValue(value); }
+		catch (ValueException ve) {}
 		
 		this.rotate.re = saved.getDouble(prefix + "rotate.re");
 		this.rotate.im = saved.getDouble(prefix + "rotate.im");

@@ -376,8 +376,13 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	@Override
 	public void setValue(double value)
 	{
-		super.setValue(value);
-		if (body != null) body.setValue(value);
+		try {
+			if (body != null) body.setValue(value);
+			super.setValue(value);
+			recalculate();
+			move_body();
+		}
+		catch (ValueException ve) { }
 	}
 	
 	@Override

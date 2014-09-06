@@ -10,26 +10,26 @@
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
     	android:background="@color/red"
+    	android:padding="20dp"
     	/>
             
 	<LinearLayout
+	    android:padding="20dp"
 		android:layout_below="@id/inventory_list_item_dialog_button_delete"
-        android:id="@+id/inventory_list_item_dialog_holder"
+        android:id="@+id/inventory_list_item_dialog_schematic_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
         >
-
-	
     </LinearLayout>
     
-	<EditText
-	    android:layout_below="@id/inventory_list_item_dialog_holder"
-	    android:id= "@+id/inventory_list_item_dialog_edit_text"
-	    android:layout_width = "match_parent"
-	    android:layout_height= "wrap_content"
-	    android:inputType="number"
-	    android:hint=""
+	<LinearLayout 
+	    android:id="@+id/inventory_list_item_dialog_accessory_holder"
+	    android:layout_below="@id/inventory_list_item_dialog_schematic_holder"	
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
 	    />
 </RelativeLayout>

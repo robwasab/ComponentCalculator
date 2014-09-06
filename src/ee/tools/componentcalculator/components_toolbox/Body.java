@@ -19,5 +19,6 @@ public interface Body {
 		public boolean isIn(Complex pnt);
 		public void saveInstanceState(Bundle state);
 		public void restoreInstanceState(Bundle saved);
-		public void setValue(double val);
+		public void setValue(double val) throws ValueException;
 }
+

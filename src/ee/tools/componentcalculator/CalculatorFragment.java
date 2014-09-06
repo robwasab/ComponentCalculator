@@ -349,12 +349,8 @@ OnClickListener{
 				
 				Components combo;
 				
-				try
-				{
-					combo = Approximator.approximate
+				combo = Approximator.approximate
 						(inventory, new Component(find_this_value), percent_error);
-				}
-				catch (ee.tools.model.KillThreadException kte) { combo = null; }
 				
 				final Components combo_copy = combo;
 				

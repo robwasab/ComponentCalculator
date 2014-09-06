@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnLongClickListener;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -201,17 +202,31 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			LinearLayout schematic_holder;
 			Schematic schematic;
 			Button delete;
-			EditText edit_text;
+			LinearLayout accessory_holder;
+			
 			public InventoryDialog(Context context, Schematic schematic) {
 				super(context);
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
+				
 				this.schematic = schematic;
-				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.CENTER_HORIZONTAL;
+				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.LEFT;
 				this.setContentView(R.layout.inventory_list_item_dialog);
 				this.setTitle("Settings");
 				delete = (Button) this.findViewById(R.id.inventory_list_item_dialog_button_delete);
-				schematic_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_holder);
+				schematic_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_schematic_holder);
 				schematic_holder.addView(schematic);
-				edit_text = (EditText) this.findViewById(R.id.inventory_list_item_dialog_edit_text);
+				
+				accessory_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_accessory_holder);
+				
+				ComponentViewInterface cvi = schematic.getCurrent();
+				if (cvi != null)
+				{
+					Object accessory = cvi.getAccessory(schematic);
+					if (accessory instanceof View)
+					{
+						accessory_holder.addView((View)accessory);
+					}
+				}
 			}
 			
 			public void dismiss()

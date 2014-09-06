@@ -1,6 +1,6 @@
 package ee.tools.componentcalculator.components_toolbox;
 
-public class ResistorException extends Exception {
+public class ResistorException extends ValueException {
 	/**
 	 * 
 	 */

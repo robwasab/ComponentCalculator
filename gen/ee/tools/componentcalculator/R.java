@@ -59,9 +59,9 @@ public final class R {
         public static final int image_button_increment=0x7f0b0026;
         public static final int inventory_check_box=0x7f0b001e;
         public static final int inventory_layout=0x7f0b0016;
+        public static final int inventory_list_item_dialog_accessory_holder=0x7f0b0021;
         public static final int inventory_list_item_dialog_button_delete=0x7f0b001f;
-        public static final int inventory_list_item_dialog_edit_text=0x7f0b0021;
-        public static final int inventory_list_item_dialog_holder=0x7f0b0020;
+        public static final int inventory_list_item_dialog_schematic_holder=0x7f0b0020;
         public static final int inventory_list_item_layout=0x7f0b001b;
         public static final int inventory_list_view=0x7f0b001a;
         public static final int inventory_menu_add=0x7f0b002d;
