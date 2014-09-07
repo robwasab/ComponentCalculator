@@ -11,10 +11,20 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int black=0x7f050005;
+        public static final int blue=0x7f050009;
+        public static final int brown=0x7f050004;
         public static final int dark=0x7f050000;
+        public static final int gold=0x7f05000c;
+        public static final int gray=0x7f05000b;
+        public static final int green=0x7f050008;
         public static final int light=0x7f050001;
+        public static final int orange=0x7f050006;
         public static final int red=0x7f050003;
+        public static final int silver=0x7f05000d;
+        public static final int violet=0x7f05000a;
         public static final int white=0x7f050002;
+        public static final int yellow=0x7f050007;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -36,7 +46,7 @@ public final class R {
         public static final int ic_trash_light=0x7f020005;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b002e;
+        public static final int action_settings=0x7f0b003f;
         public static final int calculator_button_find_combinations=0x7f0b0012;
         public static final int calculator_button_kill=0x7f0b0014;
         public static final int calculator_check_box_qnty=0x7f0b0006;
@@ -54,35 +64,52 @@ public final class R {
         public static final int calculator_text_view_precision=0x7f0b000b;
         public static final int calculator_text_view_precision_immediate_value=0x7f0b000c;
         public static final int calculator_text_view_qnty_option=0x7f0b0005;
-        public static final int fit_text_view=0x7f0b0028;
-        public static final int image_button_decrement=0x7f0b0024;
-        public static final int image_button_increment=0x7f0b0026;
-        public static final int inventory_check_box=0x7f0b001e;
-        public static final int inventory_layout=0x7f0b0016;
-        public static final int inventory_list_item_dialog_accessory_holder=0x7f0b0021;
-        public static final int inventory_list_item_dialog_button_delete=0x7f0b001f;
-        public static final int inventory_list_item_dialog_schematic_holder=0x7f0b0020;
-        public static final int inventory_list_item_layout=0x7f0b001b;
-        public static final int inventory_list_view=0x7f0b001a;
-        public static final int inventory_menu_add=0x7f0b002d;
-        public static final int inventory_menu_trash=0x7f0b002c;
-        public static final int inventory_radio_button_capacitor=0x7f0b0019;
-        public static final int inventory_radio_button_resistor=0x7f0b0018;
-        public static final int inventory_radio_group=0x7f0b0017;
-        public static final int inventory_schematic_holder=0x7f0b001c;
-        public static final int inventory_trash_dialog_button_close=0x7f0b0023;
-        public static final int inventory_trash_dialog_text_view_instructions=0x7f0b0022;
+        public static final int capacitor_accessory_button_micro=0x7f0b0018;
+        public static final int capacitor_accessory_button_milli=0x7f0b0017;
+        public static final int capacitor_accessory_button_nano=0x7f0b0019;
+        public static final int capacitor_accessory_button_pico=0x7f0b001a;
+        public static final int capacitor_accessory_edit_text=0x7f0b0016;
+        public static final int fit_text_view=0x7f0b0039;
+        public static final int image_button_decrement=0x7f0b0028;
+        public static final int image_button_increment=0x7f0b002a;
+        public static final int inventory_check_box=0x7f0b0023;
+        public static final int inventory_layout=0x7f0b001b;
+        public static final int inventory_list_item_dialog_accessory_holder=0x7f0b0026;
+        public static final int inventory_list_item_dialog_button_delete=0x7f0b0024;
+        public static final int inventory_list_item_dialog_schematic_holder=0x7f0b0025;
+        public static final int inventory_list_item_layout=0x7f0b0020;
+        public static final int inventory_list_view=0x7f0b001f;
+        public static final int inventory_menu_add=0x7f0b003e;
+        public static final int inventory_menu_trash=0x7f0b003d;
+        public static final int inventory_radio_button_capacitor=0x7f0b001e;
+        public static final int inventory_radio_button_resistor=0x7f0b001d;
+        public static final int inventory_radio_group=0x7f0b001c;
+        public static final int inventory_schematic_holder=0x7f0b0021;
+        public static final int inventory_trash_dialog_text_view_instructions=0x7f0b0027;
         public static final int main_content=0x7f0b0000;
-        public static final int number_incrementor_holder=0x7f0b001d;
+        public static final int number_incrementor_holder=0x7f0b0022;
         public static final int pager=0x7f0b0001;
-        public static final int reset_text_view=0x7f0b0029;
-        public static final int schematic_layout=0x7f0b002b;
-        public static final int schematic_table_row=0x7f0b0027;
-        public static final int schematic_text_view_value=0x7f0b002a;
+        public static final int reset_text_view=0x7f0b003a;
+        public static final int resistor_accessory_button_K=0x7f0b002c;
+        public static final int resistor_accessory_button_M=0x7f0b002d;
+        public static final int resistor_accessory_button_black=0x7f0b002e;
+        public static final int resistor_accessory_button_blue=0x7f0b0034;
+        public static final int resistor_accessory_button_brown=0x7f0b002f;
+        public static final int resistor_accessory_button_gray=0x7f0b0036;
+        public static final int resistor_accessory_button_green=0x7f0b0033;
+        public static final int resistor_accessory_button_orange=0x7f0b0031;
+        public static final int resistor_accessory_button_red=0x7f0b0030;
+        public static final int resistor_accessory_button_violet=0x7f0b0035;
+        public static final int resistor_accessory_button_white=0x7f0b0037;
+        public static final int resistor_accessory_button_yellow=0x7f0b0032;
+        public static final int resistor_accessory_edit_text=0x7f0b002b;
+        public static final int schematic_layout=0x7f0b003c;
+        public static final int schematic_table_row=0x7f0b0038;
+        public static final int schematic_text_view_value=0x7f0b003b;
         public static final int tableRow1=0x7f0b0004;
         public static final int tableRow2=0x7f0b0011;
         public static final int tableRow3=0x7f0b0007;
-        public static final int text_view_number=0x7f0b0025;
+        public static final int text_view_number=0x7f0b0029;
     }
     public static final class integer {
         public static final int calculator_integer_max_percent_error=0x7f070000;
@@ -91,12 +118,14 @@ public final class R {
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int calculator_fragment=0x7f030001;
-        public static final int inventory_fragment=0x7f030002;
-        public static final int inventory_list_item=0x7f030003;
-        public static final int inventory_list_item_dialog=0x7f030004;
-        public static final int inventory_trash_dialog=0x7f030005;
-        public static final int number_incrementor=0x7f030006;
-        public static final int schematic_fragment=0x7f030007;
+        public static final int capacitor_accessory=0x7f030002;
+        public static final int inventory_fragment=0x7f030003;
+        public static final int inventory_list_item=0x7f030004;
+        public static final int inventory_list_item_dialog=0x7f030005;
+        public static final int inventory_trash_dialog=0x7f030006;
+        public static final int number_incrementor=0x7f030007;
+        public static final int resistor_accessory=0x7f030008;
+        public static final int schematic_fragment=0x7f030009;
     }
     public static final class menu {
         public static final int inventory_menu=0x7f0a0000;

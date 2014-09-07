@@ -11,11 +11,4 @@
         android:text="@string/inventory_trash_dialog_string_instructions"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/inventory_trash_dialog_button_close"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="@string/inventory_trash_dialog_string_close" />
-
 </LinearLayout>

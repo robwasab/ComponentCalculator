@@ -2,7 +2,6 @@ package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
 
-import ee.tools.componentcalculator.components_toolbox.ComponentView;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
@@ -112,11 +111,10 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 		switch(item.getItemId())
 		{
 		case R.id.inventory_menu_trash:
-			Log.d(tag, "Trash pressed");
 			openTrashDialog();
 			return true;
 		case R.id.inventory_menu_add:
-			Log.d(tag, "Add pressed");
+			adapter.addComponent();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -128,11 +126,6 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 		final Dialog dialog = new Dialog(current_context);
 		dialog.setContentView(R.layout.inventory_trash_dialog);
 		dialog.setTitle("Delete...");
-		Button close = (Button) dialog.findViewById(R.id.inventory_trash_dialog_button_close);
-		close.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {	dialog.dismiss();	}
-		});
 		dialog.show();
 	}
 	

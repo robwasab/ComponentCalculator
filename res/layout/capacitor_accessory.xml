@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white" >
+
+    <EditText
+        android:id="@+id/capacitor_accessory_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="numberDecimal" >
+
+        <requestFocus />
+    </EditText>
+    
+	<TableRow
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    >
+
+		<Button
+		    android:id="@+id/capacitor_accessory_button_milli"
+		    style="?android:attr/buttonStyleSmall"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:padding = "10dp"
+		    android:background = "@color/white"
+		    android:text="m" />
+		<Button
+		    android:id="@+id/capacitor_accessory_button_micro"
+		    style="?android:attr/buttonStyleSmall"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:padding = "10dp"
+		    android:background = "@color/white"
+		    android:text="µ" />
+		<Button
+		    android:id="@+id/capacitor_accessory_button_nano"
+		    style="?android:attr/buttonStyleSmall"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:padding = "10dp"
+		    android:background = "@color/white"
+		    android:text="n" />
+		<Button
+		    android:id="@+id/capacitor_accessory_button_pico"
+		    style="?android:attr/buttonStyleSmall"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:padding = "10dp"
+		    android:background = "@color/white"
+		    android:text="p" />
+					    
+	</TableRow>
+	
+</LinearLayout>

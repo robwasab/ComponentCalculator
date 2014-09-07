@@ -2,6 +2,7 @@ package ee.tools.componentcalculator.components_toolbox;
 import java.util.LinkedList;
 
 import ee.tools.componentcalculator.Schematic;
+import ee.tools.model.Components;
 import ee.tools.model.EngNot;
 import ee.tools.model.Component;
 import android.graphics.Canvas;
@@ -454,6 +455,13 @@ public class ComponentView extends Component implements ComponentViewInterface {
 	@Override
 	public Object getAccessory(Schematic call_back)
 	{
-		return new ComponentViewSettings(call_back, this);
+		int type = Components.RESISTOR;
+		if (body != null)
+		{
+			if (body.getClass() == ResistorBody.class) type = Components.RESISTOR;
+			else if (body.getClass() == CapacitorBody.class) type = Components.CAPACITOR;
+		}
+		
+		return new ComponentViewSettings(call_back, this, type);
 	}
 }

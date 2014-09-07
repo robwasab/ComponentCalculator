@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" 
+    android:background="@color/white">
+    
+    <EditText
+        android:id="@+id/resistor_accessory_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="numberDecimal" >
+  
+    </EditText>
+
+    <Button
+        android:id="@+id/resistor_accessory_button_K"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight = "1"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:text="K" />
+
+    <Button
+        android:id="@+id/resistor_accessory_button_M"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight = "1"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:text="M" />
+    
+    </LinearLayout>
+    
+    <TableRow 
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        >
+        <Button
+            android:id="@+id/resistor_accessory_button_black"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/black"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_brown"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/brown"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_red"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/red"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_orange"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/orange"
+            android:text="" />
+
+        <Button
+            android:id="@+id/resistor_accessory_button_yellow"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/yellow"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_green"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/green"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_blue"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/blue"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_violet"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/violet"
+            android:text="" />
+        
+        <Button
+            android:id="@+id/resistor_accessory_button_gray"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/gray"
+            android:text="" />
+        
+        <ee.tools.componentcalculator.components_toolbox.BorderedButton
+            android:id="@+id/resistor_accessory_button_white"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/white"
+            android:text="" 
+            />
+        
+    </TableRow>
+
+</LinearLayout>

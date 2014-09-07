@@ -1,6 +1,11 @@
 package ee.tools.componentcalculator;
 
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.model.Component;
 import android.app.Dialog;
@@ -26,14 +31,14 @@ implements OnCheckedChangeListener, OnLongClickListener{
 
 	 	private LinearLayout layout;
 	 	
-		private LinearLayout schematic_layout;
+		protected LinearLayout schematic_layout;
 		
 		private CheckBox check_box;
 		
 		private NumberIncrementorView incrementor;
 		
 		//The adapter that this view belongs to, if there is one...
-		private BaseAdapter adapter = null;
+		public BaseAdapter adapter = null;
 		
 		ComponentViewInterface component_view;
 		Schematic schematic;
@@ -95,12 +100,10 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				incrementor.setComponent(c);
 			}		
 			
-			schematic = new Schematic(context, schematic_layout);
+			schematic = new Schematic(context, null);
 			
 			schematic.setSeries(component_view);
-			
-			schematic.setLayoutParams(params);
-			
+						
 			int set_width = (int)component_view.getWidth();
 			int set_height = (int)component_view.getHeight();
 			
@@ -182,7 +185,6 @@ implements OnCheckedChangeListener, OnLongClickListener{
 
 		@Override
 		public boolean onLongClick(View v) {
-			Log.d(tag, this.component_view.toString());
 			android.os.Vibrator vibrator = (Vibrator) this.getContext().getSystemService(this.getContext().VIBRATOR_SERVICE);
 			vibrator.vibrate(50);
 			schematic_layout.removeAllViews();
@@ -191,13 +193,14 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				{
 					super.dismiss();
 					schematic_layout.addView(schematic);
+					
 				}
 			};
 			dialog.show();
 			return true;
 		}
 		
-		class InventoryDialog extends Dialog
+		class InventoryDialog extends Dialog implements OnClickListener
 		{
 			LinearLayout schematic_holder;
 			Schematic schematic;
@@ -209,10 +212,11 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				
 				this.schematic = schematic;
-				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.LEFT;
+				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.CENTER;
 				this.setContentView(R.layout.inventory_list_item_dialog);
 				this.setTitle("Settings");
 				delete = (Button) this.findViewById(R.id.inventory_list_item_dialog_button_delete);
+				delete.setOnClickListener(this);
 				schematic_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_schematic_holder);
 				schematic_holder.addView(schematic);
 				
@@ -229,11 +233,56 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				}
 			}
 			
+			public void hideDeleteButton(boolean hide)
+			{
+				if (hide)
+					delete.setVisibility(Button.INVISIBLE);
+				else
+					delete.setVisibility(Button.VISIBLE);
+			}
+			
+			public void onClick(View v)
+			{
+				if (adapter.getClass() == InventoryListAdapter.class)
+				{
+					List<ComponentViewInterface> comps
+						= ((InventoryListAdapter)adapter).current_components;
+					
+					for (int i = 0; i < comps.size(); i++) 
+					{
+						if (comps.get(i) == schematic.getCurrent())
+						{
+							comps.remove(i);
+							adapter.notifyDataSetChanged();
+							break;
+						}
+					}
+					this.dismiss();
+				}
+			}
+			
 			public void dismiss()
 			{
 				super.dismiss();
 				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.LEFT;
 				schematic_holder.removeAllViews();
+				
+				//sort
+				if (adapter.getClass() == InventoryListAdapter.class)
+				{
+					List<ComponentViewInterface> comps
+						= ((InventoryListAdapter)adapter).current_components;
+					
+					Collections.sort(comps, new Comparator<ComponentViewInterface>(){
+
+						@Override
+						public int compare(ComponentViewInterface lhs,
+								ComponentViewInterface rhs) {
+							return lhs.compareTo((Component)rhs);
+						}
+					});
+				}
+
 			}
 			
 		}

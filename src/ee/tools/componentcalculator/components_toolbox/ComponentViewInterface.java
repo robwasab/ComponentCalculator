@@ -3,13 +3,14 @@ package ee.tools.componentcalculator.components_toolbox;
 import java.util.LinkedList;
 
 import ee.tools.componentcalculator.Schematic;
+import ee.tools.model.Component;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 
-public interface ComponentViewInterface {
+public interface ComponentViewInterface extends Comparable<Component>{
 
 	public void setSerialNumber(LinkedList<Integer> serial);
 	
