@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/inventory_menu_trash"
-        android:icon="@drawable/ic_trash_light"
-        android:title="@string/inventory_menu_string_trash"
+    <item android:id="@+id/inventory_menu_save"
+        android:icon="@drawable/ic_save"
+        android:title="@string/inventory_menu_string_save"
         android:showAsAction="ifRoom"
         />
-    <item android:id="@+id/inventory_menu_add"
+    
+    <item android:id="@+id/inventory_menu_load"
+        android:icon="@drawable/ic_load"
+        android:title="@string/inventory_menu_string_load"
+        android:showAsAction="ifRoom"
+        />
+   <item android:id="@+id/inventory_menu_add"
         android:icon="@drawable/ic_add"
         android:title="@string/inventory_menu_string_add"
         android:showAsAction="ifRoom"
         />
-    
+   <item android:id="@+id/inventory_menu_trash"
+        android:icon="@drawable/ic_trash_light"
+        android:title="@string/inventory_menu_string_trash"
+        android:showAsAction="ifRoom"
+        />
+     
 </menu>

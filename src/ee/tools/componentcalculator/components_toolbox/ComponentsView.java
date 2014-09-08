@@ -44,6 +44,8 @@ public class ComponentsView extends Components implements ComponentViewInterface
 	
 	boolean collapse = false;
 	
+	public static final int COLLAPSED_CAN_SHRINK = 0, CAN_SHRINK = 1;
+	
 	ComponentView collapseView;
 	
 	View parent;
@@ -149,6 +151,14 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		Body tapDat = new Tap2SeeMoreBody();
 		tag = "ComponentsView";
 		collapseView = new ComponentView(this.getSerialNumber(), tapDat, this.getValue(), this.getQnty());
+	}
+	
+	public double getValue()
+	{
+		double ret = super.getValue();
+		if (collapseView != null)
+			this.collapseView.setValue(ret);
+		return ret;
 	}
 	
 	public String toString() 
@@ -849,20 +859,27 @@ public class ComponentsView extends Components implements ComponentViewInterface
 		}
 		return result;
 	}
-
+	
 	@Override
-	public boolean shrink() 
+	public int shrink() 
 	{
-		boolean result = true;
-		Log.d(tag, "Shrinking..." + this.getSerialNumber().toString());
+		int result = 0;
+	
+		boolean canCollapseStillShrink = true;
 		
-		Log.d(tag, "Shrinking Collapsed View...");
-		result &= this.collapseView.shrink();
+		int depth = this.serial.size();
 		
-		for (int i = 0; i < size(); i++)
+		for (int j = 0; j < depth; j++)
 		{
-			result &= this.getComponentView(i).shrink();
+			canCollapseStillShrink &= 0 < collapseView.shrink() ? true : false ;
+			
+			for (int i = 0; i < size(); i++)
+			{
+				result |= this.getComponentView(i).shrink();
+			}	
 		}
+	
+		if (this.collapse) { result |= canCollapseStillShrink ? (1 << COLLAPSED_CAN_SHRINK) : 0; }
 		return result;
 	}
 

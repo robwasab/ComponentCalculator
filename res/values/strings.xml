@@ -20,7 +20,12 @@
     <string name="calculator_string_kill">Kill</string>
     <string name="inventory_menu_string_trash">Trash</string>
     <string name="inventory_menu_string_add">Add</string>
+    <string name="inventory_menu_string_load">Load Inventory From File</string>
+    <string name="inventory_menu_string_save">Save Inventory To File</string>
     <string name="inventory_trash_dialog_string_instructions">Long-Press the Component you wish to delete</string>
 	<string name="inventory_trash_dialog_string_close">Close Dialog</string>
 	<string name="inventory_list_item_dialog_string_delete">Delete</string>
+	<string name="inventory_load_dialog_string_use_preloaded">Preloaded</string>
+	<string name="inventory_load_dialog_string_use_user">User</string>
+	<string name="inventory_list_item_dialog_string_view_in_schematic">View In Schematic</string>
 </resources>

@@ -1,7 +1,9 @@
 package ee.tools.componentcalculator;
 
 import java.util.LinkedList;
+import java.util.List;
 
+import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Approximator;
 import ee.tools.model.Component;
@@ -65,7 +67,7 @@ OnClickListener{
 	
 	private String tag = "CalculatorFragment";
 	
-	private InventoryFragment inventory_fragment;
+	protected InventoryFragment inventory_fragment;
 	
 	private SchematicFragment schematic_fragment;
 		
@@ -375,8 +377,15 @@ OnClickListener{
 						
 						LinkedList<Integer> base_serial = new LinkedList<Integer>();
 					
-						base_serial.add(0);
+						List<ComponentViewInterface> inventory = null;
+						
+						if (component_type == Components.RESISTOR) 
+							inventory = inventory_fragment.adapter.resistor_components;
+						else if (component_type == Components.CAPACITOR) 
+							inventory = inventory_fragment.adapter.resistor_components;
 					
+						base_serial.add(0);
+						
 						ComponentsView first_comp = new ComponentsView(
 								schematic,
 								base_serial,
@@ -385,6 +394,10 @@ OnClickListener{
 								component_type);
 						
 						schematic.setSeries(first_comp);
+						
+						inventory.add(first_comp);
+						
+						inventory_fragment.adapter.sort(inventory);
 						
 						schematic.invalidate();
 					}

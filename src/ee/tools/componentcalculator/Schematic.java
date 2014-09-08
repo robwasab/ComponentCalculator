@@ -24,6 +24,7 @@ import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewSettings;
 import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
+import ee.tools.model.Components;
 
 /*
  * All a Schematic does is draw a ComponentsView, and direct touch movements to it.
@@ -59,10 +60,13 @@ public class Schematic extends View implements BackPressedListener
 	LinkedList<ComponentSettings> settings_stack;
 
 	private boolean fit_component_to_screen;
+
+	private boolean always_collapse;
 		
 	public Schematic(Context context, LinearLayout settings_container) 
 	{
 		super(context);
+		always_collapse = false;
 		this.setBackgroundColor(Color.CYAN);
 		this.current_context = context;
 		this.current_activity = (FragmentActivity)context;
@@ -77,6 +81,7 @@ public class Schematic extends View implements BackPressedListener
 		this.series = series;
 		this.component_stack = new LinkedList<ComponentViewInterface>();
 		this.component_stack.add(series);
+		invalidate();
 	}
 	
 	public void setFitToScreen(boolean fit)
@@ -298,9 +303,16 @@ public class Schematic extends View implements BackPressedListener
 		return true;
 	}
 	
+	public void setAlwaysCollapse(boolean always_collapse)
+	{
+		this.always_collapse = always_collapse;
+	}
+	
 	public void onDraw(Canvas c)
 	{
 		super.onDraw(c);
+		if (always_collapse) getCurrent().setCollapse(true);
+		else getCurrent().setCollapse(false);
 		ComponentDrawingUtility.draw(getCurrent(), c, this.fit_component_to_screen);
 	}
 
@@ -350,5 +362,24 @@ public class Schematic extends View implements BackPressedListener
 			xy = new Complex(x,y);
 			rotation = b.getDouble(prefix+"rotation");
 		}
-	}	
+	}
+	
+	void compress()
+	{
+		ComponentViewInterface cvi = getCurrent();
+		if (cvi.getClass() == ComponentsView.class)
+		{
+			ComponentsView cv = (ComponentsView) cvi;
+			boolean keep_shrinking;
+			do
+			{
+				int result = cv.shrink();
+				if (0 < (result & (1 << ComponentsView.COLLAPSED_CAN_SHRINK)))
+					keep_shrinking = true;
+				else 
+					keep_shrinking = false;
+			} while (keep_shrinking);
+			invalidate();
+		}
+	}
 }

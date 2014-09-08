@@ -29,7 +29,7 @@ public interface ComponentViewInterface extends Comparable<Component>{
 	
 	public boolean setShrink(int new_text_size);
 	
-	public boolean shrink();
+	public int shrink();
 	
 	public void resetShrink();
 	

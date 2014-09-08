@@ -27,8 +27,6 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 	
 	String tag = "Inventory Fragment";
 	
-	InventoryListAdapter component_adapter;
-	
 	LinkedList<ComponentViewInterface> resistor_views, capacitor_views;
 
 	private SchematicFragment schematic_fragment;
@@ -42,7 +40,7 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 	
 	RadioGroup radio_group;
 
-	private InventoryListAdapter adapter;
+	public InventoryListAdapter adapter;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,7 +88,7 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 		capacitor_views = ComponentViewFactory.makeViews(ComponentsView.CAPACITOR, cap_values);
 		
 		adapter = new InventoryListAdapter(this.getActivity(), 
-											resistor_views, capacitor_views);
+											resistor_views, capacitor_views, schematic_fragment);
 		
 		list_view.setAdapter(adapter);
 		
@@ -116,9 +114,18 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 		case R.id.inventory_menu_add:
 			adapter.addComponent();
 			return true;
+		case R.id.inventory_menu_load:
+			openLoadDialog();
+		case R.id.inventory_menu_save:
+			save();
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	private void openLoadDialog()
+	{
+		
 	}
 	
 	private void openTrashDialog()
@@ -166,4 +173,28 @@ public class InventoryFragment extends Fragment implements RadioGroup.OnCheckedC
 			break;
 		}
 	}	
+	
+	public void save()
+	{
+		//Reorganize all the component's serial numbers
+		
+		//do it for the resistors
+		for (int i = 0; i < this.resistor_views.size(); i++)
+		{
+			LinkedList<Integer> serial = new LinkedList<Integer>();
+			serial.add(i);
+			resistor_views.get(i).setSerialNumber(serial);
+			ComponentViewInterface r = resistor_views.get(i);
+			Log.d(tag, r.getSerialNumber().toString() + " " + r.toString());
+		}
+		//do it for the capacitors
+		for (int i = 0; i < this.capacitor_views.size(); i++)
+		{
+			LinkedList<Integer> serial = new LinkedList<Integer>();
+			serial.add(i);
+			capacitor_views.get(i).setSerialNumber(serial);
+			ComponentViewInterface c = capacitor_views.get(i);
+			Log.d(tag, c.getSerialNumber().toString() + " " + c.toString());
+		}
+	}
 }

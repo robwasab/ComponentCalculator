@@ -1,5 +1,7 @@
 package ee.tools.componentcalculator;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import ee.tools.componentcalculator.components_toolbox.ComponentView;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
 import ee.tools.componentcalculator.components_toolbox.ResistorBody;
 import ee.tools.componentcalculator.components_toolbox.ResistorException;
+import ee.tools.model.Component;
 import ee.tools.model.Components;
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -21,18 +24,20 @@ import android.widget.BaseAdapter;
 public class InventoryListAdapter extends BaseAdapter {
 
 	private Context context;
-	private List<ComponentViewInterface> resistor_components;
-	private List<ComponentViewInterface> capacitor_components;
+	public List<ComponentViewInterface> resistor_components;
+	public List<ComponentViewInterface> capacitor_components;
 	public List<ComponentViewInterface> current_components;
-	
+	private SchematicFragment schematic_fragment;
 	private MediaPlayer button_sound_player;
 	private int type;
 	
 	public InventoryListAdapter(Context context, 
 			List<ComponentViewInterface> resistor_components,
-				List<ComponentViewInterface> capacitor_components) 
+				List<ComponentViewInterface> capacitor_components,
+					SchematicFragment schematic_fragment) 
 	{
 		super();
+		this.schematic_fragment = schematic_fragment;
 		this.context = context;
 		this.resistor_components = resistor_components;
 		this.capacitor_components = capacitor_components;
@@ -126,12 +131,28 @@ public class InventoryListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
+		
+	public void sortCurrent() {
+		this.sort(current_components);
+	}
+	
+	public void sort(List<ComponentViewInterface> unsorted)
+	{
+		Collections.sort(unsorted, new Comparator<ComponentViewInterface>(){
+			@Override
+			public int compare(ComponentViewInterface lhs,
+					ComponentViewInterface rhs) {
+				return lhs.compareTo((Component)rhs);
+			}
+		});
+	}
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (convertView == null)
 		{
 			InventoryListItemView item = new InventoryListItemView(context, this.current_components.get(position));
+			item.setSchematicFragment(schematic_fragment);
 			item.setAdapter(this);
 			item.setMediaPlayer(button_sound_player);
 			return item;

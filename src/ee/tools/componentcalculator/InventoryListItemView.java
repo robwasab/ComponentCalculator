@@ -6,10 +6,14 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import ee.tools.componentcalculator.components_toolbox.ComponentView;
 import ee.tools.componentcalculator.components_toolbox.ComponentViewInterface;
+import ee.tools.componentcalculator.components_toolbox.ComponentsView;
 import ee.tools.model.Component;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
@@ -38,12 +42,17 @@ implements OnCheckedChangeListener, OnLongClickListener{
 		private NumberIncrementorView incrementor;
 		
 		//The adapter that this view belongs to, if there is one...
-		public BaseAdapter adapter = null;
+		public InventoryListAdapter adapter = null;
 		
 		ComponentViewInterface component_view;
+		
 		Schematic schematic;
+		
 		boolean checked = false;
+		
 		private String tag = "InventoryListItemView";
+
+		private SchematicFragment schematic_fragment;
 		
 		public InventoryListItemView(Context context, ComponentViewInterface component_view) 
 		{
@@ -51,8 +60,6 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			// 		 un-comment this next line.
 			super(context);
 					
-			this.component_view = component_view;
-			
 			LayoutParams params = new LayoutParams
 					(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			
@@ -100,10 +107,17 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				incrementor.setComponent(c);
 			}		
 			
-			schematic = new Schematic(context, null);
+			schematic = new Schematic(context, null){
+				public void onDraw(Canvas c)
+				{
+					ComponentViewInterface cvi = schematic.getCurrent();
+					cvi.setXY(0.0f, (float)(cvi.getHeight()/2.0));
+					super.onDraw(c);
+				}
+			};
 			
-			schematic.setSeries(component_view);
-						
+			this.setComponentViewInterface(component_view);
+			
 			int set_width = (int)component_view.getWidth();
 			int set_height = (int)component_view.getHeight();
 			
@@ -125,7 +139,7 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			this.incrementor.setMediaPlayer(button_sound_player);
 		}
 		
-		public void setAdapter(BaseAdapter adapter)
+		public void setAdapter(InventoryListAdapter adapter)
 		{
 			this.adapter = adapter;
 		}
@@ -140,6 +154,14 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				Component comp = (Component)this.component_view;
 				this.incrementor.setComponent(comp);
 			}		
+			
+			if (this.component_view.getClass() == ComponentsView.class)
+			{
+				this.schematic.setAlwaysCollapse(true);
+				((ComponentsView)this.component_view).setCollapse(true);
+			}
+			else
+				this.schematic.setAlwaysCollapse(false);
 			
 			int set_width = (int)component_view.getWidth();
 			int set_height = (int)component_view.getHeight();
@@ -183,6 +205,11 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			else if (this.incrementor.getValue() == -1) buttonView.setChecked(true);
 		}
 
+		public void setSchematicFragment(SchematicFragment sf)
+		{
+			this.schematic_fragment = sf;
+		}
+		
 		@Override
 		public boolean onLongClick(View v) {
 			android.os.Vibrator vibrator = (Vibrator) this.getContext().getSystemService(this.getContext().VIBRATOR_SERVICE);
@@ -193,7 +220,7 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				{
 					super.dismiss();
 					schematic_layout.addView(schematic);
-					
+					adapter.notifyDataSetChanged();
 				}
 			};
 			dialog.show();
@@ -206,6 +233,7 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			Schematic schematic;
 			Button delete;
 			LinearLayout accessory_holder;
+			ComponentViewInterface comp;
 			
 			public InventoryDialog(Context context, Schematic schematic) {
 				super(context);
@@ -222,17 +250,46 @@ implements OnCheckedChangeListener, OnLongClickListener{
 				
 				accessory_holder = (LinearLayout) this.findViewById(R.id.inventory_list_item_dialog_accessory_holder);
 				
-				ComponentViewInterface cvi = schematic.getCurrent();
-				if (cvi != null)
+				comp = schematic.getCurrent();
+				
+				if (comp != null)
 				{
-					Object accessory = cvi.getAccessory(schematic);
-					if (accessory instanceof View)
+					if (comp.getClass() == ComponentView.class)
 					{
-						accessory_holder.addView((View)accessory);
+						Object accessory = comp.getAccessory(schematic);
+						if (accessory instanceof View)
+						{
+							accessory_holder.addView((View)accessory);
+						}
+					}
+					else if (comp.getClass() == ComponentsView.class)
+					{
+						Button view_in_schematic = new Button(context);
+						
+						String button_text = context.getString(R.string.inventory_list_item_dialog_string_view_in_schematic);
+						
+						view_in_schematic.setText(button_text);
+						
+						LayoutParams button_params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+						
+						view_in_schematic.setLayoutParams(button_params);
+						
+						accessory_holder.addView(view_in_schematic);
+						
+						view_in_schematic.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								if (schematic_fragment != null)
+								{
+									schematic_fragment.schematic.setSeries(comp);
+									dismiss();
+								}
+							}						
+						});			
 					}
 				}
 			}
-			
+					
 			public void hideDeleteButton(boolean hide)
 			{
 				if (hide)
@@ -243,47 +300,26 @@ implements OnCheckedChangeListener, OnLongClickListener{
 			
 			public void onClick(View v)
 			{
-				if (adapter.getClass() == InventoryListAdapter.class)
-				{
-					List<ComponentViewInterface> comps
-						= ((InventoryListAdapter)adapter).current_components;
+				List<ComponentViewInterface> comps= adapter.current_components;
 					
-					for (int i = 0; i < comps.size(); i++) 
+				for (int i = 0; i < comps.size(); i++) 
+				{
+					if (comps.get(i) == schematic.getCurrent())
 					{
-						if (comps.get(i) == schematic.getCurrent())
-						{
-							comps.remove(i);
-							adapter.notifyDataSetChanged();
-							break;
-						}
+						comps.remove(i);
+						adapter.notifyDataSetChanged();
+						break;
 					}
-					this.dismiss();
 				}
+				this.dismiss();
 			}
 			
 			public void dismiss()
 			{
 				super.dismiss();
+				adapter.sortCurrent();
 				((LinearLayout.LayoutParams) this.schematic.getLayoutParams()).gravity = android.view.Gravity.LEFT;
 				schematic_holder.removeAllViews();
-				
-				//sort
-				if (adapter.getClass() == InventoryListAdapter.class)
-				{
-					List<ComponentViewInterface> comps
-						= ((InventoryListAdapter)adapter).current_components;
-					
-					Collections.sort(comps, new Comparator<ComponentViewInterface>(){
-
-						@Override
-						public int compare(ComponentViewInterface lhs,
-								ComponentViewInterface rhs) {
-							return lhs.compareTo((Component)rhs);
-						}
-					});
-				}
-
 			}
-			
 		}
 }

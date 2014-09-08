@@ -190,11 +190,15 @@ public class ComponentView extends Component implements ComponentViewInterface {
 		recalculate();
 	}
 	
-	public boolean shrink()
+	public int shrink()
 	{
 		Log.d(tag, "Shrinking..." + this.getSerialNumber().toString());
 
-		return setShrink(this.text_size - 1);
+		if (setShrink(this.text_size - 1))
+		{
+			return 1 << ComponentsView.CAN_SHRINK;
+		}
+		return 0;
 	}
 	
 	public boolean setShrink(int new_text_size)

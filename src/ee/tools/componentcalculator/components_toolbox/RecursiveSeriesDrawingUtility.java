@@ -137,25 +137,25 @@ public class RecursiveSeriesDrawingUtility {
 		
 		if (Math.abs(this_comp.getAngle()) > 1) rotated = true;
 		
-		if (dx < 0.0 && !rotated)
+		if (dx <= 0.0 && !rotated)
 		{
 			//draw a vert then horz
 			c.drawLine((float) p1.re, (float) p1.im, (float) p1.re, (float) p2.im, p);		
 			c.drawLine((float) p1.re, (float) p2.im, (float) p2.re, (float) p2.im, p);
 		}
-		else if (dx < 0.0 && rotated)
+		else if (dx <= 0.0 && rotated)
 		{
 			//horz then vert
 			c.drawLine((float) p1.re, (float) p1.im, (float) p2.re, (float) p1.im, p);		
 			c.drawLine((float) p2.re, (float) p1.im, (float) p2.re, (float) p2.im, p);	
 		}
-		else if (dx > 0.0 && !rotated)
+		else if (dx >= 0.0 && !rotated)
 		{
 			//horz then vert
 			c.drawLine((float) p1.re, (float) p1.im, (float) p2.re, (float) p1.im, p);		
 			c.drawLine((float) p2.re, (float) p1.im, (float) p2.re, (float) p2.im, p);	
 		}
-		else if (dx > 0.0 && rotated)
+		else if (dx >= 0.0 && rotated)
 		{
 			//vert then horz
 			c.drawLine((float) p1.re, (float) p1.im, (float) p1.re, (float) p2.im, p);		

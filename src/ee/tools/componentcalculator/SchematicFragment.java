@@ -226,8 +226,7 @@ public class SchematicFragment extends Fragment implements BackPressedListener
 			public void onClick(View v) {
 				if (schematic.getCurrent() != null)
 				{
-					schematic.getCurrent().shrink();
-					schematic.invalidate();
+					schematic.compress();
 				}
 			}	
 		});
